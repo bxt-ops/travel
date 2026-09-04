@@ -157,10 +157,11 @@ body{
 .g-para{font-size:13px; line-height:1.7; color:var(--ink);}
 /* 底部导航 */
 .tabbar{
-  position:absolute; left:0; right:0; bottom:0; z-index:30;
-  display:flex; background:var(--paper2); border-top:3px solid var(--ink);
-  padding-bottom:var(--safe-bottom);
+  position:fixed; left:0; right:0; bottom:0; z-index:1000;
+  display:none; background:var(--paper2); border-top:3px solid var(--ink);
+  padding-bottom:var(--safe-bottom); pointer-events:auto;
 }
+#view-main.active ~ .tabbar{display:flex;}
 .tabbar .tb{flex:1; text-align:center; padding:10px 0 8px; cursor:pointer; font-size:12px; font-weight:800; color:var(--ink-soft); position:relative;}
 .tabbar .tb .ic{font-size:22px; display:block; margin-bottom:2px;}
 .tabbar .tb.active{color:var(--coral);}
@@ -261,13 +262,13 @@ body{
         <div id="guide-list" data-page-node-id="YsjIPw7shZlaWST6K0Rb8p"></div>
       </div>
     </div>
-
-    <div class="tabbar" data-page-node-id="HU0SC7DyeAcglApH5HdfDs">
-      <div class="tb active" data-tab="map" data-page-node-id="4uHMnoOBOt4R3exJjc6Yqr"><span class="ic" data-page-node-id="qy80V4GbC4mY9GVhKap713">🗺</span>地图</div>
-      <div class="tb" data-tab="itinerary" data-page-node-id="79ACLiNTpWbNeMJKENdtjF"><span class="ic" data-page-node-id="MmA7yWvZW9CwIuVOLWKA72">🧭</span>行程</div>
-      <div class="tb" data-tab="guide" data-page-node-id="8UB4tW5hRFIBPBKb31Xj19"><span class="ic" data-page-node-id="85DRS0uW5KpHZL6GXX6jVC">📖</span>攻略</div>
-    </div>
   </section>
+
+  <div class="tabbar" data-page-node-id="HU0SC7DyeAcglApH5HdfDs">
+    <div class="tb active" data-tab="map" data-page-node-id="4uHMnoOBOt4R3exJjc6Yqr"><span class="ic" data-page-node-id="qy80V4GbC4mY9GVhKap713">🗺</span>地图</div>
+    <div class="tb" data-tab="itinerary" data-page-node-id="79ACLiNTpWbNeMJKENdtjF"><span class="ic" data-page-node-id="MmA7yWvZW9CwIuVOLWKA72">🧭</span>行程</div>
+    <div class="tb" data-tab="guide" data-page-node-id="8UB4tW5hRFIBPBKb31Xj19"><span class="ic" data-page-node-id="85DRS0uW5KpHZL6GXX6jVC">📖</span>攻略</div>
+  </div>
 
   <!-- 添加地点弹层 -->
   <div class="sheet-mask" id="sheet-add" data-page-node-id="bHHlGOt5nPKWWpp9nWbcGS">

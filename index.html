@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="1B3UjbmerKofH0FZ9sbWk6">
+<head data-page-node-id="RY72r5e3sJPa3VFlTB99BC">
+<meta charset="UTF-8" data-page-node-id="1Fir73PBFS0VSX2bBHGVo6">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" data-page-node-id="2esiBUKdMYmwwS0YByVTZk">
+<meta name="theme-color" content="#FFF6E9" data-page-node-id="1CaMg7DyzM9lhiAwHF9gLq">
+<meta name="apple-mobile-web-app-capable" content="yes" data-page-node-id="E0twdPyL1oYldEILeRbfWH">
+<meta name="apple-mobile-web-app-status-bar-style" content="default" data-page-node-id="Dv0DT9EKDxFyX4AjCJtNbi">
+<meta name="apple-mobile-web-app-title" content="出发吧" data-page-node-id="yZe6tDPrYYmNrjefkKMadp">
+<meta name="mobile-web-app-capable" content="yes" data-page-node-id="rvRJ9RbyzE6rOwZr7y0m7Q">
+<meta name="format-detection" content="telephone=no" data-page-node-id="w9db7nup55D47BpIrDqZwK">
+<title>出发吧 · 旅行规划师</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦊%3C/text%3E%3C/svg%3E" data-page-node-id="sca7TJ18H0nOY6bHn2vUFi">
+<style>
+:root{
+  --paper:#FFF6E9; --paper2:#FFFDF6; --ink:#5A4632; --ink-soft:#9B8466;
+  --coral:#F27A6B; --sage:#7FB17B; --sky:#5BA8D8; --lilac:#A98BD0; --sun:#E9B44C; --mint:#4FB8A8;
+  --line:#EAD9BE; --shadow:0 6px 20px rgba(90,70,50,.10);
+  --safe-top:env(safe-area-inset-top); --safe-bottom:env(safe-area-inset-bottom);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans CJK SC',sans-serif;
+  color:var(--ink); background:var(--paper);
+  overflow:hidden; position:fixed; inset:0; width:100%;
+  -webkit-user-select:none; user-select:none;
+}
+/* ===== 手绘纹理背景 ===== */
+#app{
+  height:100%; display:flex; flex-direction:column;
+  background-image:
+    radial-gradient(var(--line) 1.4px, transparent 1.4px),
+    radial-gradient(var(--line) 1.4px, transparent 1.4px);
+  background-size:26px 26px; background-position:0 0, 13px 13px;
+  position:relative; overflow:hidden;
+}
+/* ===== 通用手绘卡片 ===== */
+.hand{border:3px solid var(--ink); background:var(--paper2);}
+.hand-a{border-radius:255px 15px 225px 15px / 15px 225px 15px 255px;}
+.hand-b{border-radius:15px 225px 15px 255px / 225px 15px 255px 15px;}
+.hand-c{border-radius:24px 24px 24px 24px;}
+.btn{
+  border:3px solid var(--ink); background:var(--paper2); color:var(--ink);
+  border-radius:999px; font-weight:700; cursor:pointer; padding:12px 18px;
+  font-size:16px; display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  box-shadow:0 3px 0 var(--ink); transition:transform .08s ease, box-shadow .08s ease;
+  min-height:48px; touch-action:manipulation;
+}
+.btn:active{transform:translateY(3px); box-shadow:0 0 0 var(--ink);}
+.btn.primary{background:var(--coral); color:#fff;}
+.btn.green{background:var(--sage); color:#fff;}
+.btn.blue{background:var(--sky); color:#fff;}
+.btn.ghost{background:transparent; box-shadow:none; border-style:dashed;}
+.btn.sm{padding:7px 12px; min-height:36px; font-size:14px; box-shadow:0 2px 0 var(--ink);}
+/* ===== 视图切换 ===== */
+.view{position:absolute; inset:0; display:none; flex-direction:column; padding-top:calc(12px + var(--safe-top));}
+.view.active{display:flex;}
+/* ===== Setup 视图 ===== */
+#view-setup{padding:calc(20px + var(--safe-top)) 20px calc(20px + var(--safe-bottom)); overflow-y:auto; gap:14px;}
+.mascot-head{display:flex; align-items:center; gap:12px; justify-content:center; flex-direction:column; text-align:center;}
+.mascot{font-size:56px; line-height:1; animation:float 3s ease-in-out infinite; display:inline-block;}
+.mascot.small{font-size:30px; animation:none;}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-3deg);}50%{transform:translateY(-8px) rotate(3deg);}}
+.title{font-size:30px; font-weight:900; letter-spacing:1px;}
+.subtitle{font-size:14px; color:var(--ink-soft);}
+.cloud{position:absolute; font-size:40px; opacity:.7; animation:float 5s ease-in-out infinite;}
+@keyframes drift{from{transform:translateX(-20px);}to{transform:translateX(20px);}}
+.section-title{font-size:15px; font-weight:800; margin:2px 0 8px; display:flex; align-items:center; gap:6px;}
+.field{display:flex; gap:10px; align-items:stretch;}
+.field input{
+  flex:1; border:3px solid var(--ink); background:#fff; border-radius:16px; padding:12px 14px;
+  font-size:16px; color:var(--ink); min-width:0; outline:none;
+}
+.field input::placeholder{color:#c8b8a0;}
+.chips{display:flex; flex-wrap:wrap; gap:8px;}
+.chip{
+  border:2.5px solid var(--ink); background:#fff; border-radius:999px; padding:9px 14px;
+  font-size:14px; font-weight:600; display:inline-flex; align-items:center; gap:6px; cursor:pointer;
+  box-shadow:2px 3px 0 rgba(90,70,50,.15); transition:transform .08s;
+}
+.chip:active{transform:scale(.94);}
+.chip .x{width:20px;height:20px;border-radius:50%;background:var(--coral);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;line-height:1;}
+.chip.add{background:var(--sun); color:var(--ink);}
+.suggest-label{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+.stepper{display:flex; align-items:center; gap:14px; justify-content:center;}
+.stepper .num{font-size:30px; font-weight:900; min-width:44px; text-align:center;}
+.stepper .btn{width:52px;height:52px;font-size:26px;padding:0;border-radius:18px;}
+/* ===== Main 视图 ===== */
+#view-main{padding:0; }
+.topbar{
+  display:flex; align-items:center; gap:10px; padding:calc(10px + var(--safe-top)) 16px 8px;
+  background:var(--paper); border-bottom:3px dashed var(--line); z-index:5;
+}
+.topbar .t-title{font-size:18px; font-weight:900; flex:1; display:flex; align-items:center; gap:8px;}
+.daychips{display:flex; gap:8px; padding:10px 16px; overflow-x:auto; scrollbar-width:none; background:var(--paper);}
+.daychips::-webkit-scrollbar{display:none;}
+.daychip{
+  border:2.5px solid var(--ink); border-radius:999px; padding:8px 16px; font-weight:800; font-size:14px;
+  white-space:nowrap; cursor:pointer; background:#fff; flex-shrink:0; transition:all .12s;
+}
+.daychip.active{color:#fff; transform:translateY(-2px); box-shadow:0 3px 0 var(--ink);}
+.tab-body{flex:1; position:relative; overflow:hidden;}
+.tab{position:absolute; inset:0; display:none; flex-direction:column; overflow-y:auto;}
+.tab.active{display:flex;}
+/* 地图 Tab */
+#tab-map{overflow:hidden;}
+.map-wrap{flex:1; position:relative; min-height:0;}
+#map-container,#mock-map{position:absolute; inset:0;}
+#mock-map{width:100%;height:100%;display:block;}
+.map-hint{
+  position:absolute; top:12px; left:12px; right:12px; z-index:6;
+  background:rgba(255,246,233,.95); border:2.5px solid var(--ink); border-radius:14px;
+  padding:8px 12px; font-size:12px; color:var(--ink-soft); display:flex; gap:8px; align-items:center;
+}
+.legend{position:absolute; left:12px; bottom:12px; z-index:6; display:flex; flex-direction:column; gap:6px;}
+.legend .lg{display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; background:rgba(255,253,246,.92); border:2px solid var(--ink); border-radius:999px; padding:4px 10px;}
+.legend .dot{width:12px;height:12px;border-radius:50%;display:inline-block;border:2px solid var(--ink);}
+/* 行程 Tab */
+#tab-itinerary{padding:14px 14px calc(90px + var(--safe-bottom)); gap:14px;}
+.day-block{margin-bottom:6px;}
+.day-block-head{display:flex; align-items:center; gap:8px; margin:4px 2px 10px; flex-wrap:wrap;}
+.day-block-head .dn{font-size:16px; font-weight:900;}
+.day-block-head .dn b{font-size:13px;color:var(--ink-soft);font-weight:600;margin-left:4px;}
+.it-item{
+  display:flex; align-items:center; gap:10px; padding:12px; margin-bottom:10px;
+  position:relative; transition:transform .08s;
+}
+.it-item.dragging{opacity:.9; z-index:20; transform:scale(1.03) rotate(-1deg); box-shadow:0 10px 24px rgba(90,70,50,.2);}
+.it-item .drag{font-size:20px; color:var(--ink-soft); cursor:grab; touch-action:none; padding:6px 2px;}
+.it-item .seq{
+  width:32px;height:32px;border-radius:50%;color:#fff;font-weight:900;font-size:15px;
+  display:flex;align-items:center;justify-content:center;border:2.5px solid var(--ink); flex-shrink:0;
+}
+.it-item .info{flex:1; min-width:0;}
+.it-item .info .nm{font-weight:800; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.it-item .info .tm{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+.it-item .acts{display:flex; flex-direction:column; gap:5px; align-items:center;}
+.it-item .acts .row{display:flex; gap:5px;}
+.ibtn{width:34px;height:34px;border-radius:11px;border:2.5px solid var(--ink);background:#fff;font-size:15px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);}
+.ibtn:active{transform:scale(.9);}
+.ibtn.del{color:#fff;background:var(--coral);}
+.ibtn.day{font-size:12px;}
+.empty{text-align:center; padding:40px 20px; color:var(--ink-soft); font-size:14px;}
+/* 攻略 Tab */
+#tab-guide{padding:14px 14px calc(90px + var(--safe-bottom)); gap:14px;}
+.g-day{margin-bottom:8px;}
+.g-day-head{display:flex; align-items:center; gap:10px; margin:8px 2px 10px;}
+.g-day-head .gdn{font-size:17px; font-weight:900; display:flex; align-items:center; gap:8px;}
+.g-card{padding:16px; margin-bottom:14px;}
+.g-card h4{font-size:14px; font-weight:900; margin-bottom:8px; display:flex; align-items:center; gap:6px;}
+.g-sched{width:100%; border-collapse:collapse; font-size:13px;}
+.g-sched td{padding:8px 6px; border-bottom:2px dashed var(--line); vertical-align:top;}
+.g-sched td:first-child{font-weight:800; white-space:nowrap; color:var(--ink);}
+.g-sched .st{color:var(--ink-soft);}
+.g-tag{display:inline-block; border:2px solid var(--ink); background:#fff; border-radius:999px; padding:5px 12px; margin:3px 4px 3px 0; font-size:13px; font-weight:600;}
+.g-para{font-size:13px; line-height:1.7; color:var(--ink);}
+/* 底部导航 */
+.tabbar{
+  position:absolute; left:0; right:0; bottom:0; z-index:30;
+  display:flex; background:var(--paper2); border-top:3px solid var(--ink);
+  padding-bottom:var(--safe-bottom);
+}
+.tabbar .tb{flex:1; text-align:center; padding:10px 0 8px; cursor:pointer; font-size:12px; font-weight:800; color:var(--ink-soft); position:relative;}
+.tabbar .tb .ic{font-size:22px; display:block; margin-bottom:2px;}
+.tabbar .tb.active{color:var(--coral);}
+.tabbar .tb.active::after{content:''; position:absolute; top:-3px; left:30%; right:30%; height:3px; background:var(--coral); border-radius:3px;}
+/* 导出按钮区 */
+.export-bar{display:flex; gap:10px; padding:4px 2px;}
+.export-bar .btn{flex:1;}
+/* 底部弹层(添加地点) */
+.sheet-mask{position:fixed; inset:0; background:rgba(90,70,50,.35); z-index:50; display:none; align-items:flex-end;}
+.sheet-mask.show{display:flex;}
+.sheet{
+  width:100%; background:var(--paper); border:3px solid var(--ink); border-bottom:none;
+  border-radius:26px 26px 0 0; padding:18px 18px calc(20px + var(--safe-bottom));
+  animation:slideUp .25s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.sheet .s-title{font-size:16px; font-weight:900; margin-bottom:12px; display:flex; align-items:center; gap:8px;}
+/* Toast */
+#toast{
+  position:fixed; left:50%; bottom:calc(80px + var(--safe-bottom)); transform:translateX(-50%) translateY(20px);
+  background:var(--ink); color:#fff; padding:10px 18px; border-radius:999px; font-size:14px; font-weight:700;
+  opacity:0; pointer-events:none; transition:all .25s; z-index:99; white-space:nowrap; max-width:90%;
+}
+#toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+/* 模拟地图SVG描边动画 */
+.route-line{stroke-dasharray:10 8; animation:dashmove 1.4s linear infinite;}
+@keyframes dashmove{to{stroke-dashoffset:-36;}}
+.pin-pop{transform-origin:center; animation:pinpop .5s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes pinpop{from{transform:scale(0); opacity:0;}to{transform:scale(1); opacity:1;}}
+</style>
+</head>
+<body data-page-node-id="9NasxeMEUA7dbL3XqzRDKc">
+<div id="app" data-page-node-id="27SSlbkpDrh6Tc4qI4oOuN">
+
+  <!-- ============ 设置页 ============ -->
+  <section id="view-setup" class="view active" data-page-node-id="S7PmyuGBfXA1c2FxmtH3CG">
+    <div class="mascot-head" data-page-node-id="ATNBvGvb24Ppw1hHSqMvBP">
+      <span class="mascot" data-page-node-id="9v8VqUNlDOz5L5GIf8GbET">🦊</span>
+      <div class="title" data-page-node-id="0zPVpJA0dtnVNQkKQeqk3I">出发吧！旅行规划师</div>
+      <div class="subtitle" data-page-node-id="kHb9n4JznRpjEY7pgdpp3a">我是小狐狸阿吉，帮你把旅程安排得明明白白 ✨</div>
+    </div>
+
+    <div data-page-node-id="lvo3flwVmKeMrWBZdZARak">
+      <div class="section-title" data-page-node-id="TJYEwoS2pmGvMlt3Hd9NvM">📍 想去哪儿？</div>
+      <div class="field" data-page-node-id="063D0Y6cM91EXJkrWuNOlq">
+        <input id="loc-input" type="text" placeholder="输入地点名，如：鼓浪屿" enterkeyhint="done" data-page-node-id="EFdLavGUo9IxpdsFtl3Abq">
+        <button class="btn primary" id="btn-add" data-page-node-id="vj9VK6UgJpWchUZromjoWZ">＋ 添加</button>
+      </div>
+      <div class="suggest-label" data-page-node-id="d24hyateSCH4c75FTrbEP8">点击快速添加（厦门示例）：</div>
+      <div class="chips" id="suggest-chips" data-page-node-id="p91fyUMNj3qoJNMylneh7v"></div>
+      <div class="suggest-label" style="margin-top:10px;" data-page-node-id="HDMOlMqIryxBVm7xZRrxol">已添加：</div>
+      <div class="chips" id="loc-chips" data-page-node-id="ZVtiEBkEDRJpn0ONlg0fx3"></div>
+    </div>
+
+    <div data-page-node-id="Wz6XGzp8asZaYkWhfPD3ud">
+      <div class="section-title" data-page-node-id="hxHPusPJVJhxLIAsHlQ41y">🗓 玩几天？</div>
+      <div class="stepper" data-page-node-id="woZyHvKn8Rb0BM0DIGdDZN">
+        <button class="btn" id="day-minus" data-page-node-id="y0sEmoIL5RAqIghz4BoZnu">−</button>
+        <span class="num" id="day-num" data-page-node-id="eEGIb8FZ34JPHB32Cj9MtE">3</span>
+        <button class="btn" id="day-plus" data-page-node-id="Leau0CSPp5d4vvtmPKjvaL">＋</button>
+      </div>
+    </div>
+
+    <button class="btn primary" id="btn-generate" style="font-size:19px; padding:16px;" data-page-node-id="SAVMLx454N30nh9KYZTDYy">✨ 生成智能行程</button>
+    <div class="subtitle" style="text-align:center;" data-page-node-id="wPdd0Lf3RNNFtYgB0RCaqn">会按天智能分组、规划最优路线，并生成完整攻略</div>
+  </section>
+
+  <!-- ============ 主界面 ============ -->
+  <section id="view-main" class="view" data-page-node-id="AFN4RB4XnK16WFIhKzYufF">
+    <div class="topbar" data-page-node-id="W3cThYaG2YpUCg52q3Ajce">
+      <span class="mascot small" data-page-node-id="lkfrAXYk34CrJG061yCCti">🐼</span>
+      <div class="t-title" id="top-title" data-page-node-id="grnF1iJ7et56T9qyLUmEXR">厦门 3 天游</div>
+      <button class="btn sm ghost" id="btn-back" data-page-node-id="9btqtRJbon6JCPoBiVECMl">✎ 编辑</button>
+    </div>
+
+    <div class="tab-body" data-page-node-id="mBFjzQp0F5JVjFN5GiXHw2">
+      <!-- 地图 -->
+      <div class="tab active" id="tab-map" data-page-node-id="SfnrBRlr4CfDszdDRkob2K">
+        <div class="daychips" id="map-daychips" data-page-node-id="qKvV9gwkwNK3cWUSrO7rRb"></div>
+        <div class="map-wrap" data-page-node-id="33k0xARdOZ30rZhuDyLVf0">
+          <div id="map-container" data-page-node-id="N4345f1kvDzUHRJhgMzGQ7"></div>
+          <svg id="mock-map" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" data-page-node-id="ZoUA9nkC94AzgnSF72t6Dc"></svg>
+          <div class="map-hint" id="map-hint" data-page-node-id="c4HI51xOsOv93EuD9r2wUL">🗺 <span id="map-hint-text" data-page-node-id="lvvgK9z52vmEpFXoxq4ZnJ">演示模式：未配置地图Key，显示手绘示意地图</span></div>
+          <div class="legend" id="legend" data-page-node-id="an7xX6KYEtCqmVSs393Mm0"></div>
+        </div>
+      </div>
+
+      <!-- 行程 -->
+      <div class="tab" id="tab-itinerary" data-page-node-id="d2BZNE0Dwb73b9XvL78r3c">
+        <div id="itinerary-list" data-page-node-id="EERkmqlayddTzJFDFLcNu5"></div>
+      </div>
+
+      <!-- 攻略 -->
+      <div class="tab" id="tab-guide" data-page-node-id="MkA3heZe4738PnvKEitTRs">
+        <div class="export-bar" data-page-node-id="zsQGzQPlEpgaxgzAsUQHvw">
+          <button class="btn blue" id="btn-export-all" data-page-node-id="HK4MKyNb81wJewVITWozqX">🖼 导出全部为图片</button>
+        </div>
+        <div id="guide-list" data-page-node-id="YsjIPw7shZlaWST6K0Rb8p"></div>
+      </div>
+    </div>
+
+    <div class="tabbar" data-page-node-id="HU0SC7DyeAcglApH5HdfDs">
+      <div class="tb active" data-tab="map" data-page-node-id="4uHMnoOBOt4R3exJjc6Yqr"><span class="ic" data-page-node-id="qy80V4GbC4mY9GVhKap713">🗺</span>地图</div>
+      <div class="tb" data-tab="itinerary" data-page-node-id="79ACLiNTpWbNeMJKENdtjF"><span class="ic" data-page-node-id="MmA7yWvZW9CwIuVOLWKA72">🧭</span>行程</div>
+      <div class="tb" data-tab="guide" data-page-node-id="8UB4tW5hRFIBPBKb31Xj19"><span class="ic" data-page-node-id="85DRS0uW5KpHZL6GXX6jVC">📖</span>攻略</div>
+    </div>
+  </section>
+
+  <!-- 添加地点弹层 -->
+  <div class="sheet-mask" id="sheet-add" data-page-node-id="bHHlGOt5nPKWWpp9nWbcGS">
+    <div class="sheet" data-page-node-id="0KXW13FEBQrwyi7RJq3bj8">
+      <div class="s-title" data-page-node-id="pFaCG4GWIQeWNch4JIf9mv">🐰 添加地点到 <span id="sheet-day-label" data-page-node-id="kEjEhWXRwxxIy8VP1e2Mq5"></span></div>
+      <div class="field" style="margin-bottom:10px;" data-page-node-id="GVypD2Nhyin2ZcoHU5wYHO">
+        <input id="sheet-input" type="text" placeholder="输入或选择地点" data-page-node-id="ScQe19DBUI9kCBknj1CEgN">
+      </div>
+      <div class="chips" id="sheet-suggest" style="margin-bottom:12px;" data-page-node-id="C4s8Np3EzdGNGIAAZfTQBj"></div>
+      <div style="display:flex; gap:10px;" data-page-node-id="cdKYtsppMMmDSEMzDZqpWY">
+        <button class="btn ghost" id="btn-sheet-cancel" style="flex:1;" data-page-node-id="4HmKZOT7DhO3BxvJM1VUTS">取消</button>
+        <button class="btn primary" id="btn-sheet-confirm" style="flex:1;" data-page-node-id="N38V8XZ4FJxJ8Z2xGKtqpF">确定添加</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" data-page-node-id="EzybSBPqkJQzCmpBnLOBHV"></div>
+</div>
+
+<script>
+/* =====================================================================
+ *  🎒 出发吧 · 旅行规划师
+ *  单文件移动端 PWA —— 无外部依赖（腾讯地图 Key 可选）
+ * ===================================================================== */
+
+/* ---------- ① 腾讯地图 Key（在此填入你的 Key 即可启用真实地图） ---------- */
+const TENCENT_MAP_KEY = 'G3VBZ-CU6Y5-7CCIG-IGOWV-F64NS-66BB4';   // 已填入腾讯地图 Key
+
+/* ---------- ② 配色 ---------- */
+const DAY_COLORS = ['#F27A6B','#7FB17B','#5BA8D8','#A98BD0','#E9B44C','#4FB8A8','#E98BB0','#8FB8C9'];
+const DAY_NAMES  = ['第 1 天','第 2 天','第 3 天','第 4 天','第 5 天','第 6 天','第 7 天','第 8 天'];
+const MASCOTS    = ['🦊','🐼','🐰','🐨','🐻','🐹'];
+
+/* ---------- ③ 景点数据库（厦门示例，含坐标/时长/交通/美食/贴士） ---------- */
+const DB = [
+  {name:'鼓浪屿', lat:24.4476, lng:118.0650, anchor:true, dur:5,
+   transport:'从厦鼓码头乘轮渡上岛（约20分钟），建议提前1-2天网上购票',
+   food:['叶氏麻糍','龙头鱼丸汤','黄胜记肉松','张三疯奶茶'],
+   tip:'岛上全程步行，穿舒适运动鞋；登日光岩俯瞰全景，钢琴博物馆值得一看'},
+  {name:'厦门大学', lat:24.4347, lng:118.0930, dur:2.5,
+   transport:'公交/打车至「厦门大学」站，需提前在公众号预约入校',
+   food:['芙蓉餐厅','厦大一条街小吃'],
+   tip:'需提前预约；芙蓉隧道涂鸦墙很出片，傍晚光线最佳'},
+  {name:'沙坡尾', lat:24.4350, lng:118.0790, dur:2,
+   transport:'从厦门大学步行约15分钟，或骑行共享单车',
+   food:['沙坡尾艺术西区咖啡','避风坞海鲜排挡','网红甜品店'],
+   tip:'傍晚避风坞夕阳超美；艺术西区有很多文创小店可逛'},
+  {name:'植物园', lat:24.4510, lng:118.0970, dur:3, alias:'厦门园林植物园',
+   transport:'公交至「植物园」站或打车前往西门',
+   food:['植物园周边素菜馆'],
+   tip:'多肉植物区和雨林喷雾区必打卡（喷雾有时段，提前查好时间）'},
+  {name:'环岛路', lat:24.4280, lng:118.1310, dur:3,
+   transport:'经典玩法是骑行，沿途可租共享单车或电动车',
+   food:['曾厝垵小吃','海景咖啡馆'],
+   tip:'傍晚骑行看日落；沿线有白城沙滩、音乐广场、书法广场'},
+  {name:'中山路', lat:24.4565, lng:118.0770, dur:2,
+   transport:'厦门老城区中心，公交/地铁1号线可达',
+   food:['黄则和花生汤','局口拌面','沙茶面'],
+   tip:'骑楼老街夜景美，是买伴手礼的好地方'},
+  {name:'曾厝垵', lat:24.4250, lng:118.1280, dur:2.5,
+   transport:'环岛路沿线，公交「曾厝垵」站下车',
+   food:['蚵仔煎','土笋冻','海蛎煎'],
+   tip:'小渔村改造的文艺街区，小吃和民宿集中，晚上热闹'},
+  {name:'南普陀寺', lat:24.4450, lng:118.0900, dur:1.5,
+   transport:'紧邻厦门大学，步行可达',
+   food:['南普陀素饼（伴手礼）'],
+   tip:'免费开放，寺内素斋有名；可顺路登五老峰'},
+  {name:'胡里山炮台', lat:24.4280, lng:118.1080, dur:1.5,
+   transport:'环岛路旁，公交「胡里山炮台」站',
+   food:['炮台附近海鲜餐厅'],
+   tip:'看世界最大海岸炮「克虏伯大炮」，下午有清兵操练表演'},
+  {name:'白城沙滩', lat:24.4260, lng:118.1010, dur:1.5,
+   transport:'厦门大学白城校门对面，步行即到',
+   food:['沙滩边小摊椰子','海景咖啡'],
+   tip:'看日落的好地方，与环岛路骑行可串联'},
+  {name:'集美学村', lat:24.5660, lng:118.1010, dur:3,
+   transport:'地铁1号线到「集美学村」站（跨海段风景绝佳）',
+   food:['集美大社沙茶面','学村小吃'],
+   tip:'嘉庚建筑群很有特色；地铁跨海段被称「海上小火车」'}
+];
+
+/* ---------- ④ 状态 ---------- */
+const STORE_KEY = 'chufaba_travel_plan_v1';
+let state = {
+  locations: [],   // {id,name,lat,lng,dur,transport,food,tip,day(0-based)}
+  days: 3,
+  activeDay: 0,
+  tab: 'map',
+  city: '目的地'
+};
+let mockMapDrawn = false;
+
+/* ---------- 工具 ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2,9);
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),1800); }
+function colorOf(day){ return DAY_COLORS[day % DAY_COLORS.length]; }
+function dist(a,b){ const dx=a.lng-b.lng, dy=a.lat-b.lat; return Math.hypot(dx,dy); }
+
+/* ---------- ⑤ 地点解析 ---------- */
+function findInDB(name){
+  const n = name.trim();
+  return DB.find(d => d.name===n || (d.alias && d.alias===n) || d.name.includes(n) || (n.length>1 && d.name.includes(n)));
+}
+function resolveLocation(name){
+  const hit = findInDB(name);
+  if(hit) return { ...hit };
+  // 未命中：生成一个带随机偏移的坐标，仍可在地图上显示
+  const jitter = (Math.random()-0.5)*0.03;
+  return { name: name.trim(), lat: 24.44 + jitter, lng: 118.09 + jitter, dur: 2,
+           transport:'公共交通或打车前往', food:['当地特色小吃'], tip:'出发前查好开放时间' };
+}
+function addLocation(name, day){
+  const loc = resolveLocation(name);
+  loc.id = uid(); loc.day = day;
+  state.locations.push(loc);
+  save();
+}
+
+/* ---------- ⑥ 持久化 ---------- */
+function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+function load(){
+  try{ const s = localStorage.getItem(STORE_KEY); if(s){ state = Object.assign(state, JSON.parse(s)); } }catch(e){}
+  if(state.days < 1) state.days = 1;
+}
+
+/* ---------- ⑦ 智能分组算法 ---------- */
+// 最远点初始化 + 锚点优先 + 最近邻分配 + 聚类内最近邻排序
+function clusterPlan(locs, k){
+  const n = locs.length;
+  if(n===0) return [];
+  k = Math.min(k, n);
+  const pts = locs.map((l,i) => ({...l, _i:i}));
+
+  // 锚点（如鼓浪屿）优先成为独立中心
+  const centers = [];
+  const anchors = pts.filter(p=>p.anchor);
+  anchors.forEach(a=>{ if(centers.length<k) centers.push({lat:a.lat,lng:a.lng,id:a.id,anchor:true}); });
+
+  // 最远点采样补齐中心
+  while(centers.length < k){
+    let best=null, bestD=-1;
+    for(const p of pts){
+      if(centers.some(c=>c.id===p.id)) continue;
+      const d = centers.length ? Math.min(...centers.map(c=>dist(c,p))) : 0;
+      if(centers.length===0 || d>bestD){ bestD=d; best=p; if(centers.length===0) break; }
+    }
+    if(!best) break;
+    centers.push({lat:best.lat,lng:best.lng,id:best.id});
+  }
+
+  // 分配
+  const groups = centers.map(()=>[]);
+  pts.forEach(p=>{
+    let bi=0, bd=Infinity;
+    centers.forEach((c,i)=>{ const d=dist(c,p); if(d<bd){bd=d;bi=i;} });
+    groups[bi].push(p);
+  });
+
+  // 锚点独占：锚点所在簇只保留锚点本身（若存在非锚点簇可接收溢出）
+  const anchorIdx = new Set(centers.map((c,i)=>c.anchor?i:-1).filter(i=>i>=0));
+  if(anchorIdx.size>0 && anchorIdx.size<centers.length){
+    const nonAnchor = centers.map((c,i)=>i).filter(i=>!anchorIdx.has(i));
+    anchorIdx.forEach(ai=>{
+      const keep = groups[ai].filter(p=>p.anchor);
+      const extra = groups[ai].filter(p=>!p.anchor);
+      groups[ai] = keep;
+      extra.forEach(p=>{
+        let bi=nonAnchor[0], bd=Infinity;
+        nonAnchor.forEach(j=>{ const d=dist(centers[j],p); if(d<bd){bd=d;bi=j;} });
+        groups[bi].push(p);
+      });
+    });
+  }
+
+  // 软均衡：允许 ceil(n/k)+1 上限
+  const cap = Math.ceil(n/k) + 1;
+  for(let i=0;i<groups.length;i++){
+    while(groups[i].length > cap){
+      // 找离中心最远的点移走
+      let far=groups[i][0], farD=-1, farIdx=0;
+      groups[i].forEach((p,idx)=>{ const d=dist(centers[i],p); if(d>farD){farD=d;far=p;farIdx=idx;} });
+      groups[i].splice(farIdx,1);
+      // 移到最近的不满簇
+      let bi=0, bd=Infinity;
+      groups.forEach((g,j)=>{ if(g.length<cap){ const d=dist(centers[j],far); if(d<bd){bd=d;bi=j;} } });
+      groups[bi].push(far);
+    }
+  }
+
+  // 聚类内最近邻排序（从离中心最近的点开始）
+  const ordered = groups.map(g=>{
+    if(g.length<=1) return g;
+    const c = centers[groups.indexOf(g)];
+    let cur = g.reduce((a,b)=> dist(c,a)<=dist(c,b)?a:b);
+    const rest = g.filter(p=>p!==cur);
+    const seq = [cur];
+    while(rest.length){
+      let nxt=rest[0], nd=Infinity;
+      rest.forEach(p=>{ const d=dist(cur,p); if(d<nd){nd=d;nxt=p;} });
+      seq.push(nxt); rest.splice(rest.indexOf(nxt),1); cur=nxt;
+    }
+    return seq;
+  });
+
+  // 按“第一个用户输入地点所在簇 = 第1天”，其余按最小输入序号排序
+  const order = groups.map((g,gi)=> ({gi, minIdx: g.reduce((m,p)=> Math.min(m, p._i), Infinity) }));
+  order.sort((a,b)=>a.minIdx-b.minIdx);
+  // 重建
+  const result = [];
+  order.forEach((o, dayIndex)=>{
+    ordered[o.gi].forEach(p=>{ result.push({...p, day: dayIndex}); });
+  });
+  // 空簇兜底
+  for(let d=0; d<k; d++) if(!result.some(r=>r.day===d)){ /* 无 */ }
+  return result;
+}
+
+function detectCity(){
+  const hit = state.locations.filter(l => DB.some(d => d.name === l.name));
+  state.city = hit.length ? '厦门' : '目的地';
+}
+function generatePlan(){
+  const locs = state.locations.map(l=>({...l}));
+  if(locs.length===0){ toast('先添加几个地点吧～'); return; }
+  const grouped = clusterPlan(locs, state.days);
+  state.locations = grouped;
+  state.activeDay = 0;
+  detectCity();
+  save();
+  mockMapDrawn = false;
+  showMain();
+}
+
+/* ---------- ⑧ 渲染：设置页 ---------- */
+function renderSuggest(){
+  $('#suggest-chips').innerHTML = DB.slice(0,7).map(d=>
+    `<span class="chip" data-add="${esc(d.name)}">＋ ${esc(d.name)}</span>`
+  ).join('');
+  $$('#suggest-chips .chip').forEach(c=> c.onclick=()=>{ addLocation(c.dataset.add, 0); renderSetup(); toast('已添加 '+c.dataset.add); });
+}
+function renderChips(){
+  const wrap = $('#loc-chips');
+  if(state.locations.length===0){ wrap.innerHTML='<span class="subtitle" style="padding:6px 2px;">还没有地点，先添加一个吧～</span>'; return; }
+  wrap.innerHTML = state.locations.map(l=>
+    `<span class="chip">${esc(l.name)}<span class="x" data-rm="${l.id}">✕</span></span>`
+  ).join('');
+  $$('#loc-chips .x').forEach(x=> x.onclick=(e)=>{ e.stopPropagation();
+    state.locations = state.locations.filter(l=>l.id!==x.dataset.rm); save(); renderSetup(); });
+}
+function renderSetup(){
+  renderChips();
+  $('#day-num').textContent = state.days;
+}
+function addFromInput(){
+  const inp = $('#loc-input'); const v = inp.value.trim();
+  if(!v){ toast('请输入地点名'); return; }
+  addLocation(v, 0); inp.value=''; renderSetup(); toast('已添加 '+v);
+}
+
+/* ---------- ⑨ 渲染：主界面 ---------- */
+function showMain(){
+  $('#view-setup').classList.remove('active');
+  $('#view-main').classList.add('active');
+  $('#top-title').textContent = state.city + ' ' + state.days + ' 天游';
+  renderDayChips();
+  renderMap();
+  renderItinerary();
+  renderGuide();
+  switchTab('map');
+}
+function backToSetup(){
+  $('#view-main').classList.remove('active');
+  $('#view-setup').classList.add('active');
+  renderSetup();
+}
+
+function dayLocations(d){ return state.locations.filter(l=>l.day===d); }
+function renderDayChips(){
+  const mk = (sel, containerId) => {
+    const el = $(containerId);
+    el.innerHTML = state.locations.length===0 ? '' :
+      Array.from({length:state.days}).map((_,d)=>{
+        const n = dayLocations(d).length;
+        return `<span class="daychip ${d===state.activeDay?'active':''}" data-day="${d}"
+          style="${d===state.activeDay?('background:'+colorOf(d)):''}">${DAY_NAMES[d]} · ${n}地</span>`;
+      }).join('');
+    $$(el+' .daychip').forEach(c=> c.onclick=()=>{ state.activeDay=+c.dataset.day; renderDayChips(); renderMap(); renderItinerary(); });
+  };
+  mk('map','#map-daychips');
+}
+function switchTab(name){
+  state.tab = name; save();
+  $$('.tab').forEach(t=>t.classList.remove('active'));
+  $('#tab-'+name).classList.add('active');
+  $$('.tabbar .tb').forEach(b=> b.classList.toggle('active', b.dataset.tab===name));
+  if(name==='map') renderMap();
+  if(name==='itinerary') renderItinerary();
+  if(name==='guide') renderGuide();
+}
+
+/* ---------- ⑩ 地图渲染（腾讯地图 或 手绘示意） ---------- */
+function initRealMap(){
+  const el = $('#map-container');
+  $('#mock-map').style.display='none';
+  el.style.display='block';
+  if(window.TMap) buildRealMap();
+  else if(!window.__mapLoading){
+    window.__mapLoading = true;
+    const s = document.createElement('script');
+    s.src = `https://map.qq.com/api/gljs?v=1.exp&key=${TENCENT_MAP_KEY}&libraries=service`;
+    s.onload = buildRealMap;
+    s.onerror = ()=>{ toast('地图加载失败，检查Key/网络'); window.__mapLoading=false; };
+    document.head.appendChild(s);
+  }
+}
+function makePinSVG(color, num){
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="44" height="56" viewBox="0 0 44 56">
+    <path d="M22 2C11 2 3 10 3 21c0 14 19 33 19 33s19-19 19-33C41 10 33 2 22 2z" fill="${color}" stroke="#5A4632" stroke-width="2.5"/>
+    <circle cx="22" cy="20" r="11" fill="#fff" stroke="#5A4632" stroke-width="2"/>
+    <text x="22" y="26" font-size="15" font-weight="900" text-anchor="middle" fill="#5A4632" font-family="sans-serif">${num}</text>
+  </svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+function buildRealMap(){
+  const el = $('#map-container');
+  const pts = state.locations;
+  const center = pts[0] ? new TMap.LatLng(pts[0].lat, pts[0].lng) : new TMap.LatLng(24.45,118.09);
+  const map = new TMap.Map(el, {
+    center, zoom: 12, viewMode:'2D',
+    baseMap: { type:'vector' }
+  });
+  window.__map = map;
+  // 标记
+  const markerGeos = [];
+  const layerGeos = { styles:{}, geometries:[] };
+  const lineStyles = {}; const lineGeoms = [];
+  const bounds = new TMap.LatLngBounds();
+  pts.forEach((p, i)=>{
+    const c = colorOf(p.day);
+    const sid = 's'+i;
+    layerGeos.styles[sid] = new TMap.MarkerStyle({ width:44, height:56, anchor:{x:22,y:52}, src: makePinSVG(c, i+1) });
+    layerGeos.geometries.push({ id:'p'+p.id, styleId:sid, position:new TMap.LatLng(p.lat,p.lng) });
+    bounds.extend(new TMap.LatLng(p.lat,p.lng));
+  });
+  new TMap.MultiMarker({ map, ...layerGeos });
+  // 连线（按天）
+  const byDay = {};
+  pts.forEach(p=> (byDay[p.day]=byDay[p.day]||[]).push(p));
+  Object.keys(byDay).forEach(d=>{
+    const c = colorOf(+d);
+    const paths = byDay[d].map(p=> new TMap.LatLng(p.lat,p.lng));
+    if(paths.length>=2){
+      lineStyles['line'+d] = new TMap.PolylineStyle({ color:c, width:6, borderWidth:0, lineCap:'round' });
+      lineGeoms.push({ id:'l'+d, styleId:'line'+d, paths });
+    }
+  });
+  if(lineGeoms.length) new TMap.MultiPolyline({ map, styles:lineStyles, geometries:lineGeoms });
+  if(pts.length) map.fitBounds(bounds, { padding: 60 });
+}
+function renderMap(){
+  $('#map-hint-text').textContent = TENCENT_MAP_KEY
+    ? '已配置地图Key · 腾讯地图' : '演示模式：未配置地图Key，显示手绘示意地图';
+  if(TENCENT_MAP_KEY){ initRealMap(); }
+  else { $('#map-container').style.display='none'; $('#mock-map').style.display='block'; renderMockMap(); }
+  renderLegend();
+}
+function renderLegend(){
+  const el = $('#legend');
+  if(state.locations.length===0){ el.innerHTML=''; return; }
+  // 显示选中天的图例
+  const d = state.activeDay;
+  el.innerHTML = `<div class="lg"><span class="dot" style="background:${colorOf(d)}"></span>${DAY_NAMES[d]} 路线</div>`;
+}
+/* 手绘示意地图 */
+function renderMockMap(){
+  const svg = $('#mock-map');
+  const pts = state.locations;
+  if(pts.length===0){
+    svg.innerHTML = `<rect width="1000" height="1000" fill="#DFF0F7"/>
+      <text x="500" y="470" font-size="40" text-anchor="middle" fill="#5A4632">🗺</text>
+      <text x="500" y="540" font-size="26" text-anchor="middle" fill="#9B8466">添加地点后，这里会画出</text>
+      <text x="500" y="580" font-size="26" text-anchor="middle" fill="#9B8466">手绘路线示意图</text>`;
+    return;
+  }
+  const lats = pts.map(p=>p.lat), lngs = pts.map(p=>p.lng);
+  const minLat=Math.min(...lats), maxLat=Math.max(...lats);
+  const minLng=Math.min(...lngs), maxLng=Math.max(...lngs);
+  const spanLat = (maxLat-minLat)||0.01, spanLng=(maxLng-minLng)||0.01;
+  const W=1000,H=1000,pad=120;
+  const X = lng => pad + (lng-minLng)/spanLng*(W-2*pad);
+  const Y = lat => pad + (maxLat-lat)/spanLat*(H-2*pad);
+
+  let out = [];
+  // 海面 + 岛屿
+  out.push(`<rect width="1000" height="1000" fill="#DCEFF7"/>`);
+  // 波浪
+  for(let y=0;y<H;y+=70){ out.push(`<path d="M0 ${y} q 60 -16 120 0 t 120 0 t 120 0 t 120 0 t 120 0 t 120 0 t 120 0 t 120 0 t 120 0" fill="none" stroke="#BFE0EE" stroke-width="8" stroke-linecap="round" opacity=".6"/>`); }
+  // 岛屿主体
+  out.push(`<path d="M120 250 Q 500 120 860 240 Q 930 500 860 760 Q 500 900 150 770 Q 70 520 120 250 Z" fill="#F4EBCF" stroke="#5A4632" stroke-width="10" stroke-linejoin="round" stroke-dasharray="0"/>`);
+  out.push(`<path d="M140 255 Q 500 140 840 255 Q 905 500 840 745 Q 500 875 165 755 Q 95 520 140 255 Z" fill="none" stroke="#5A4632" stroke-width="4" stroke-dasharray="12 10" opacity=".55"/>`);
+  // 绿地斑块
+  out.push(`<path d="M220 300 q 90 -60 200 -20 q 60 40 20 110 q -80 60 -200 10 q -60 -50 -20 -100 Z" fill="#E2EDC2" stroke="#9FB67F" stroke-width="5" opacity=".9"/>`);
+  out.push(`<path d="M600 520 q 100 -50 220 0 q 50 40 0 110 q -120 40 -220 -30 q -50 -40 0 -80 Z" fill="#D8E9C8" stroke="#9FB67F" stroke-width="5" opacity=".9"/>`);
+  // 装饰：太阳、云、树
+  out.push(`<circle cx="860" cy="130" r="46" fill="#FFD66B" stroke="#5A4632" stroke-width="6"/>`);
+  out.push(`<g stroke="#5A4632" stroke-width="6" fill="none" stroke-linecap="round"><path d="M860 56 v-22 M860 204 v22 M786 130 h-22 M934 130 h22"/></g>`);
+  out.push(`<g fill="#fff" stroke="#5A4632" stroke-width="5"><path d="M180 150 a30 30 0 0 1 30 -22 a38 38 0 0 1 68 -8 a30 30 0 0 1 38 26 a26 26 0 0 1 2 60 h-138 a24 24 0 0 1 0 -56 Z"/></g>`);
+  // 按天连线
+  const byDay={}; pts.forEach(p=> (byDay[p.day]=byDay[p.day]||[]).push(p));
+  Object.keys(byDay).forEach(d=>{
+    const arr = byDay[d]; const c=colorOf(+d);
+    if(arr.length<2) return;
+    const ps = arr.map(p=>`${X(p.lng)},${Y(p.lat)}`).join(' ');
+    out.push(`<polyline points="${ps}" fill="none" stroke="${c}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity=".5" class="route-line"/>`);
+    out.push(`<polyline points="${ps}" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`);
+  });
+  // 标记
+  pts.forEach((p,i)=>{
+    const c=colorOf(p.day), cx=X(p.lng), cy=Y(p.lat);
+    const delay = i*0.06;
+    out.push(`<g class="pin-pop" style="animation-delay:${delay}s" transform="translate(${cx},${cy})">
+      <path d="M0 0 C -26 -10 -26 -30 0 -42 C 26 -30 26 -10 0 0 Z" fill="${c}" stroke="#5A4632" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="0" cy="-22" r="15" fill="#fff" stroke="#5A4632" stroke-width="3.5"/>
+      <text x="0" y="-16" font-size="18" font-weight="900" text-anchor="middle" fill="#5A4632" font-family="sans-serif">${i+1}</text>
+    </g>`);
+    // 地名标签
+    out.push(`<rect x="${cx-58}" y="${cy+14}" width="116" height="30" rx="15" fill="rgba(255,253,246,.95)" stroke="#5A4632" stroke-width="3"/>
+      <text x="${cx}" y="${cy+35}" font-size="17" font-weight="700" text-anchor="middle" fill="#5A4632">${esc(p.name.length>6?p.name.slice(0,6):p.name)}</text>`);
+  });
+  svg.innerHTML = out.join('');
+}
+
+/* ---------- ⑪ 行程渲染 + 编辑 ---------- */
+function fmtTime(h){ return String(Math.floor(h)).padStart(2,'0') + ':' + String(Math.round((h%1)*60)).padStart(2,'0'); }
+function scheduleFor(dayLocs){
+  // 生成当日时间轴：9:00 出发
+  let t = 9.0; const sched=[];
+  dayLocs.forEach((l,i)=>{
+    const start=t;
+    const dur = l.dur || 2;
+    sched.push({ name:l.name, start:fmtTime(start), end:fmtTime(start+dur), dur });
+    t = start + dur + 0.5; // 0.5h 通勤
+  });
+  return sched;
+}
+function renderItinerary(){
+  const el = $('#itinerary-list');
+  if(state.locations.length===0){ el.innerHTML='<div class="empty">还没有行程，点左上角「编辑」去添加地点吧 🐰</div>'; return; }
+  const blocks = [];
+  for(let d=0; d<state.days; d++){
+    const locs = dayLocations(d);
+    const sched = scheduleFor(locs);
+    blocks.push(`<div class="day-block" data-day="${d}">
+      <div class="day-block-head">
+        <span class="mascot small">${MASCOTS[d%MASCOTS.length]}</span>
+        <span class="dn">${DAY_NAMES[d]}<b> · ${locs.length} 个地点</b></span>
+        <span style="flex:1"></span>
+        <button class="btn sm" data-export="${d}">🖼 导出本天</button>
+      </div>`);
+    if(locs.length===0){
+      blocks.push(`<div class="empty" style="padding:14px;">这天还没有安排～点下方按钮添加</div>`);
+    } else {
+      locs.forEach((l,idx)=>{
+        const s = sched[idx];
+        blocks.push(`<div class="it-item hand hand-c" data-id="${l.id}" style="background:#fff;">
+          <div class="drag">☰</div>
+          <div class="seq" style="background:${colorOf(d)}">${idx+1}</div>
+          <div class="info">
+            <div class="nm">${esc(l.name)}</div>
+            <div class="tm">${s.start} - ${s.end} · 约${l.dur||2}小时</div>
+          </div>
+          <div class="acts">
+            <div class="row">
+              <div class="ibtn up" title="上移">↑</div>
+              <div class="ibtn down" title="下移">↓</div>
+            </div>
+            <div class="row">
+              <div class="ibtn day" title="移到下一天">${d+1}→</div>
+              <div class="ibtn del" title="删除">✕</div>
+            </div>
+          </div>
+        </div>`);
+      });
+    }
+    blocks.push(`<button class="btn ghost sm" style="width:100%;" data-addday="${d}">＋ 在${DAY_NAMES[d]}添加地点</button></div>`);
+  }
+  el.innerHTML = blocks.join('');
+
+  // 事件绑定
+  $$('#itinerary-list .it-item').forEach(item=>{
+    const id = item.dataset.id;
+    item.querySelector('.up').onclick   = ()=> moveItem(id,-1);
+    item.querySelector('.down').onclick = ()=> moveItem(id, 1);
+    item.querySelector('.del').onclick  = ()=> { state.locations = state.locations.filter(l=>l.id!==id); save(); renderAll(); };
+    item.querySelector('.day').onclick  = ()=> moveItemToNextDay(id);
+  });
+  $$('#itinerary-list [data-addday]').forEach(b=> b.onclick=()=> openAddSheet(+b.dataset.addday));
+  $$('#itinerary-list [data-export]').forEach(b=> b.onclick=()=> exportSingleDay(+b.dataset.export));
+  bindDrag();
+}
+function moveItem(id, dir){
+  const idx = state.locations.findIndex(l=>l.id===id);
+  if(idx<0) return;
+  const day = state.locations[idx].day;
+  const same = state.locations.map((l,i)=>({l,i})).filter(o=>o.l.day===day);
+  const pos = same.findIndex(o=>o.l.id===id);
+  const target = pos + dir;
+  if(target<0 || target>=same.length) return;
+  const a = state.locations[same[pos].i], b = state.locations[same[target].i];
+  state.locations[same[pos].i] = b; state.locations[same[target].i] = a;
+  save(); renderAll();
+}
+function moveItemToNextDay(id){
+  const idx = state.locations.findIndex(l=>l.id===id);
+  if(idx<0) return;
+  const l = state.locations[idx];
+  const nd = (l.day + 1) % state.days;
+  l.day = nd;
+  // 移到数组末尾，作为新一天的末尾项
+  state.locations.splice(idx,1); state.locations.push(l);
+  save(); renderAll(); toast(l.name+' → '+DAY_NAMES[nd]);
+}
+/* 触屏拖拽排序 */
+function bindDrag(){
+  const list = $('#itinerary-list');
+  let dragEl=null, startX=0, startY=0, ghost=null;
+  list.querySelectorAll('.drag').forEach(h=>{
+    h.addEventListener('pointerdown', e=>{
+      dragEl = h.closest('.it-item'); if(!dragEl) return;
+      e.preventDefault();
+      startX=e.clientX; startY=e.clientY; ghost=null;
+      dragEl.classList.add('dragging');
+      dragEl.setPointerCapture(e.pointerId);
+    });
+    h.addEventListener('pointermove', e=>{
+      if(!dragEl) return;
+      const over = document.elementFromPoint(e.clientX, e.clientY)?.closest('.it-item');
+      if(over && over!==dragEl){
+        const listEl = dragEl.parentElement;
+        // 判断拖到目标上方还是下方
+        const r = over.getBoundingClientRect();
+        const mid = r.top + r.height/2;
+        if(e.clientY < mid) listEl.insertBefore(dragEl, over);
+        else listEl.insertBefore(dragEl, over.nextSibling);
+      }
+    });
+    const end = e=>{
+      if(!dragEl) return;
+      dragEl.classList.remove('dragging');
+      // 依据 DOM 顺序更新 state.locations
+      const ids = $$('#itinerary-list .it-item').map(x=>x.dataset.id);
+      const map = {}; state.locations.forEach(l=>map[l.id]=l);
+      state.locations = ids.map(id=>map[id]).filter(Boolean);
+      dragEl=null; save(); renderAll();
+    };
+    h.addEventListener('pointerup', end);
+    h.addEventListener('pointercancel', end);
+  });
+}
+
+/* ---------- ⑫ 攻略渲染 ---------- */
+function renderGuide(){
+  const el = $('#guide-list');
+  if(state.locations.length===0){ el.innerHTML='<div class="empty">生成行程后，这里会给出完整攻略 📖</div>'; return; }
+  let out = [];
+  for(let d=0; d<state.days; d++){
+    const locs = dayLocations(d);
+    if(locs.length===0) continue;
+    const sched = scheduleFor(locs);
+    const foods = [...new Set(locs.flatMap(l=>l.food||[]))];
+    const tips  = locs.map(l=>l.tip).filter(Boolean);
+    out.push(`<div class="g-day">
+      <div class="g-day-head"><span class="mascot small">${MASCOTS[d%MASCOTS.length]}</span>
+        <span class="gdn" style="color:${colorOf(d)}">${DAY_NAMES[d]}</span>
+        <span class="g-tag">${locs.length} 个地点</span>
+      </div>`);
+
+    // 日程表
+    out.push(`<div class="g-card hand hand-a">
+      <h4>🗓 行程时间表</h4>
+      <table class="g-sched">`);
+    sched.forEach(s=>{
+      out.push(`<tr><td>${s.start}</td><td class="st">→ ${s.end}</td><td><b>${esc(s.name)}</b><br><span class="st">建议停留约${s.dur}小时</span></td></tr>`);
+    });
+    out.push(`</table></div>`);
+
+    // 交通
+    out.push(`<div class="g-card hand hand-b">
+      <h4>🚌 交通建议</h4>
+      <div class="g-para">` +
+      locs.map(l=>`<b>${esc(l.name)}：</b>${esc(l.transport||'公共交通可达')}`).join('<br>') +
+      `</div></div>`);
+
+    // 美食
+    out.push(`<div class="g-card hand hand-c">
+      <h4>🍜 美食推荐</h4>
+      <div>${foods.map(f=>`<span class="g-tag">${esc(f)}</span>`).join('')}</div></div>`);
+
+    // 贴士
+    out.push(`<div class="g-card hand hand-a">
+      <h4>💡 小贴士</h4>
+      <div class="g-para">${tips.map(t=>`· ${esc(t)}`).join('<br>')}
+      <br>· 出门带好充电宝和水，厦门天气多变备把伞</div></div></div>`);
+  }
+  el.innerHTML = out.join('');
+}
+
+/* ---------- ⑬ 添加地点弹层 ---------- */
+let sheetDay = 0, sheetPick = null;
+function openAddSheet(day){
+  sheetDay = day; sheetPick=null;
+  $('#sheet-day-label').textContent = DAY_NAMES[day];
+  $('#sheet-input').value='';
+  renderSheetSuggest('');
+  $('#sheet-add').classList.add('show');
+}
+function renderSheetSuggest(q){
+  const el = $('#sheet-suggest');
+  let items = DB;
+  if(q) items = DB.filter(d=>d.name.includes(q)||(d.alias&&d.alias.includes(q)));
+  else items = DB.slice(0,8);
+  el.innerHTML = items.map(d=>`<span class="chip ${sheetPick===d.name?'add':''}" data-pick="${esc(d.name)}">${esc(d.name)}</span>`).join('');
+  $$('#sheet-suggest .chip').forEach(c=> c.onclick=()=>{ sheetPick=c.dataset.pick; $('#sheet-input').value=c.dataset.pick; renderSheetSuggest(c.dataset.pick); });
+}
+$('#sheet-input').addEventListener('input', e=> renderSheetSuggest(e.target.value.trim()));
+$('#btn-sheet-cancel').onclick = ()=> $('#sheet-add').classList.remove('show');
+$('#btn-sheet-confirm').onclick = ()=>{
+  const v = $('#sheet-input').value.trim();
+  if(!v){ toast('请选择或输入地点'); return; }
+  addLocation(v, sheetDay);
+  $('#sheet-add').classList.remove('show');
+  renderAll(); toast('已添加到 '+DAY_NAMES[sheetDay]);
+};
+
+/* ---------- ⑭ 导出图片 ---------- */
+function svgEsc(s){ return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function buildCardSVG(title, daysArray, colorIdx){
+  const W = 760, pad = 44;
+  let y = 0; const parts = [];
+  // 头部
+  const headerH = 150;
+  parts.push(`<rect x="0" y="0" width="${W}" height="${headerH}" rx="0" fill="#FFFDF6"/>`);
+  parts.push(`<rect x="14" y="14" width="${W-28}" height="${headerH-28}" rx="24" fill="#FFF6E9" stroke="#5A4632" stroke-width="5"/>`);
+  parts.push(`<text x="${pad+8}" y="72" font-size="44">🦊</text>`);
+  parts.push(`<text x="${pad+66}" y="74" font-size="34" font-weight="900" fill="#5A4632">${svgEsc(title)}</text>`);
+  parts.push(`<text x="${pad+66}" y="108" font-size="20" fill="#9B8466">${svgEsc(state.city)} · ${svgEsc(state.days+' 天')} · 出发吧旅行规划师</text>`);
+  y = headerH + 6;
+
+  daysArray.forEach((locs, di)=>{
+    const c = DAY_COLORS[(colorIdx!==undefined?colorIdx:di) % DAY_COLORS.length];
+    const sched = scheduleFor(locs);
+    // 天标题条
+    parts.push(`<rect x="18" y="${y}" width="${W-36}" height="66" rx="20" fill="${c}" stroke="#5A4632" stroke-width="5"/>`);
+    parts.push(`<text x="40" y="${y+44}" font-size="28" font-weight="900" fill="#fff">第 ${di+1} 天</text>`);
+    parts.push(`<text x="${W-40}" y="${y+44}" font-size="22" font-weight="700" fill="#fff" text-anchor="end">${locs.length} 个地点</text>`);
+    y += 66 + 18;
+    // 地点行
+    locs.forEach((l,i)=>{
+      const s = sched[i];
+      const rh = 92;
+      parts.push(`<rect x="18" y="${y}" width="${W-36}" height="${rh}" rx="18" fill="#FFFFFF" stroke="#5A4632" stroke-width="4"/>`);
+      parts.push(`<circle cx="58" cy="${y+rh/2}" r="19" fill="${c}" stroke="#5A4632" stroke-width="4"/>`);
+      parts.push(`<text x="58" y="${y+rh/2+8}" font-size="20" font-weight="900" text-anchor="middle" fill="#fff">${i+1}</text>`);
+      parts.push(`<text x="92" y="${y+36}" font-size="25" font-weight="800" fill="#5A4632">${svgEsc(l.name)}</text>`);
+      parts.push(`<text x="92" y="${y+68}" font-size="19" fill="#9B8466">${s.start} - ${s.end} · 约${l.dur||2}小时</text>`);
+      y += rh + 12;
+    });
+    // 美食
+    const foods = [...new Set(locs.flatMap(l=>l.food||[]))].slice(0,4);
+    if(foods.length){
+      const fh = 84;
+      parts.push(`<rect x="18" y="${y}" width="${W-36}" height="${fh}" rx="18" fill="#FFF6E9" stroke="#5A4632" stroke-width="4"/>`);
+      parts.push(`<text x="36" y="${y+38}" font-size="23" font-weight="800" fill="#5A4632">🍜 美食：</text>`);
+      parts.push(`<text x="36" y="${y+70}" font-size="20" fill="#5A4632">${foods.map(svgEsc).join(' · ')}</text>`);
+      y += fh + 12;
+    }
+    y += 14;
+  });
+  // 底部
+  const fh = 90;
+  parts.push(`<rect x="18" y="${y}" width="${W-36}" height="${fh}" rx="22" fill="#FFD66B" stroke="#5A4632" stroke-width="5"/>`);
+  parts.push(`<text x="40" y="${y+56}" font-size="30">🧭</text>`);
+  parts.push(`<text x="92" y="${y+58}" font-size="24" font-weight="800" fill="#5A4632">祝旅途愉快，一路生花！</text>`);
+  y += fh + 30;
+
+  return { svg: parts.join(''), height: y };
+}
+function exportToPNG(title, daysArray, colorIdx){
+  const card = buildCardSVG(title, daysArray, colorIdx);
+  const full = `<svg xmlns="http://www.w3.org/2000/svg" width="760" height="${card.height}" font-family="PingFang SC, Microsoft YaHei, sans-serif">`+card.svg+`</svg>`;
+  const img = new Image();
+  img.onload = ()=>{
+    const scale = 2;
+    const canvas = document.createElement('canvas');
+    canvas.width = 760*scale; canvas.height = card.height*scale;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale,scale);
+    ctx.fillStyle = '#FFFDF6'; ctx.fillRect(0,0,760,card.height);
+    ctx.drawImage(img,0,0,760,card.height);
+    canvas.toBlob(blob=>{
+      if(!blob){ toast('导出失败'); return; }
+      const file = new File([blob], title+'.png', {type:'image/png'});
+      shareOrDownload(file, blob);
+    },'image/png');
+  };
+  img.onerror = ()=> toast('图片生成失败');
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(full);
+}
+function shareOrDownload(file, blob){
+  const url = URL.createObjectURL(blob);
+  const nav = navigator;
+  if(nav.share && nav.canShare && nav.canShare({files:[file]})){
+    nav.share({ files:[file], title:file.name }).catch(()=>download(url,file.name));
+  } else if(/iP(hone|ad|od)/.test(navigator.userAgent)){
+    // iOS：无分享文件能力时开新窗口长按保存
+    window.open(url,'_blank');
+    toast('图片已打开，长按即可保存到相册');
+  } else {
+    download(url, file.name);
+  }
+  setTimeout(()=>URL.revokeObjectURL(url), 30000);
+}
+function download(url, name){
+  const a = document.createElement('a'); a.href=url; a.download=name; a.click();
+  toast('图片已导出 📸');
+}
+$('#btn-export-all').onclick = ()=>{
+  const days = [];
+  for(let d=0; d<state.days; d++){ const l=dayLocations(d); if(l.length) days.push(l); }
+  if(!days.length){ toast('没有可导出的行程'); return; }
+  exportToPNG('我的旅行攻略', days);
+};
+function exportSingleDay(day){
+  const locs = dayLocations(day);
+  if(!locs.length){ toast('这天没有行程'); return; }
+  exportToPNG(DAY_NAMES[day]+'攻略', [locs], day);
+}
+
+/* ---------- ⑮ 全局渲染 ---------- */
+function renderAll(){ renderDayChips(); renderMap(); renderItinerary(); renderGuide(); }
+
+/* ---------- ⑯ PWA 安装（单文件最佳努力） ---------- */
+function setupPWA(){
+  try{
+    const manifest = {
+      name:'出发吧 · 旅行规划师', short_name:'出发吧', display:'standalone',
+      start_url: location.href, background_color:'#FFF6E9', theme_color:'#FFF6E9',
+      icons:[{src:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🦊</text></svg>'), sizes:'any', type:'image/svg+xml'}]
+    };
+    const link = document.createElement('link');
+    link.rel='manifest';
+    link.href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(manifest));
+    document.head.appendChild(link);
+  }catch(e){}
+}
+
+/* ---------- ⑰ 初始化 + 事件绑定 ---------- */
+function init(){
+  setupPWA();
+  load();
+  renderSetup();
+  renderSuggest();
+  // 如果已有行程，直接进主界面
+  if(state.locations.length){ showMain(); }
+
+  $('#btn-add').onclick = addFromInput;
+  $('#loc-input').addEventListener('keydown', e=>{ if(e.key==='Enter') addFromInput(); });
+  $('#day-minus').onclick = ()=>{ if(state.days>1){ state.days--; save(); renderSetup(); } };
+  $('#day-plus').onclick  = ()=>{ if(state.days<8){ state.days++; save(); renderSetup(); } };
+  $('#btn-generate').onclick = generatePlan;
+  $('#btn-back').onclick = backToSetup;
+  $$('.tabbar .tb').forEach(b=> b.onclick=()=>switchTab(b.dataset.tab));
+
+  // 单天导出按钮（行程页顶部常驻一个）
+  const itin = $('#itinerary-list');
+  const obs = new MutationObserver(()=>{});
+  obs.observe(itin, {childList:true});
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

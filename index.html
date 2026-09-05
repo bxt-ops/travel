@@ -192,6 +192,34 @@ body{
 @keyframes dashmove{to{stroke-dashoffset:-36;}}
 .pin-pop{transform-origin:center; animation:pinpop .5s cubic-bezier(.34,1.56,.64,1) both;}
 @keyframes pinpop{from{transform:scale(0); opacity:0;}to{transform:scale(1); opacity:1;}}
+
+/* ===== 行程编辑态 ===== */
+.it-input{
+  font:inherit; color:var(--ink); background:#FFFDF6;
+  border:2px solid var(--line); border-radius:10px; padding:6px 8px;
+  width:100%; outline:none; transition:border-color .12s;
+}
+.it-input:focus{border-color:var(--coral);}
+.it-name{font-weight:800; font-size:15px; margin-bottom:4px;}
+.it-meta{display:flex; gap:8px; flex-wrap:wrap; margin-top:2px; font-size:12px; color:var(--ink-soft);}
+.it-meta label{display:inline-flex; align-items:center; gap:4px; background:#FFFDF6; border:2px solid var(--line); border-radius:10px; padding:2px 4px 2px 6px;}
+.it-meta .it-input{width:auto; min-width:48px; padding:3px 4px; border:none; background:transparent; font-weight:800; color:var(--ink);}
+.it-summary{
+  padding:12px; margin:6px 2px 10px;
+  background:linear-gradient(180deg,#FFFDF6,#FFF6E9);
+  border:2.5px dashed var(--ink); border-radius:14px;
+}
+.it-summary .it-route{font-size:13px; font-weight:800; color:var(--ink); line-height:1.5;}
+.it-summary .it-cost{font-size:13px; color:var(--coral); margin-top:4px;}
+.it-summary .it-cost b{font-size:16px;}
+.it-grand{
+  margin:18px 2px 4px; padding:14px 16px; text-align:center;
+  background:var(--ink); color:#fff; border-radius:14px; font-size:15px;
+}
+.it-grand b{color:#FFD89B; font-size:20px; margin-left:4px;}
+.btn.sm{padding:8px 12px; font-size:13px; min-height:34px;}
+.btn.blue{background:#5BA8D8; color:#fff;}
+.btn.blue:active{background:#3D8DBE;}
 </style>
 </head>
 <body data-page-node-id="9NasxeMEUA7dbL3XqzRDKc">
@@ -296,7 +324,7 @@ body{
  * ===================================================================== */
 
 /* ---------- ① 腾讯地图 Key（在此填入你的 Key 即可启用真实地图） ---------- */
-const TENCENT_MAP_KEY = '';   // TODO: 填入你的 Key，例如 'XXXXX-XXXXX-XXXXX'
+const TENCENT_MAP_KEY = 'G3VBZ-CU6Y5-7CCIG-IGOWV-F64NS-66BB4';   // 已填入腾讯地图 Key
 
 /* ---------- ② 配色 ---------- */
 const DAY_COLORS = ['#F27A6B','#7FB17B','#5BA8D8','#A98BD0','#E9B44C','#4FB8A8','#E98BB0','#8FB8C9'];
@@ -576,18 +604,40 @@ function switchTab(name){
 }
 
 /* ---------- ⑩ 地图渲染（腾讯地图 或 手绘示意） ---------- */
+const MAP_LOAD_TIMEOUT_MS = 8000;
 function initRealMap(){
+  // 已经构建过真地图：只更新覆盖物
+  if(window.__mapBuilt && window.__map){ updateMap(); return; }
+  // 正在加载中：不要重复插入 script
+  if(window.__mapLoading) return;
+  // 已确认失败 / 走 fallback 路线
+  if(window.__mapFailed){ fallbackToMock(); return; }
+
   $('#mock-map').style.display='none';
   $('#map-container').style.display='block';
-  if(window.TMap) buildRealMap();
-  else if(!window.__mapLoading){
-    window.__mapLoading = true;
-    const s = document.createElement('script');
-    s.src = `https://map.qq.com/api/gljs?v=1.exp&key=${TENCENT_MAP_KEY}&libraries=service`;
-    s.onload = buildRealMap;
-    s.onerror = ()=>{ toast('地图加载失败，检查Key/网络'); window.__mapLoading=false; };
-    document.head.appendChild(s);
-  }
+
+  if(window.TMap){ buildRealMap(); return; }
+
+  window.__mapLoading = true;
+  const timer = setTimeout(()=>{
+    if(!window.__mapBuilt){
+      window.__mapFailed = true; window.__mapLoading = false;
+      toast('地图加载超时，自动切换为手绘示意');
+      fallbackToMock();
+    }
+  }, MAP_LOAD_TIMEOUT_MS);
+
+  const s = document.createElement('script');
+  s.src = `https://map.qq.com/api/gljs?v=1.exp&key=${TENCENT_MAP_KEY}&libraries=service`;
+  s.onload = ()=>{ clearTimeout(timer); window.__mapLoading = false; buildRealMap(); };
+  s.onerror = ()=>{ clearTimeout(timer); window.__mapFailed = true; window.__mapLoading = false; toast('地图加载失败，自动切换为手绘示意'); fallbackToMock(); };
+  document.head.appendChild(s);
+}
+function fallbackToMock(){
+  $('#map-container').style.display='none';
+  $('#map-container').innerHTML='';
+  $('#mock-map').style.display='block';
+  try{renderMockMap();}catch(e){}
 }
 function makePinSVG(color, num){
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="44" height="56" viewBox="0 0 44 56">
@@ -598,61 +648,70 @@ function makePinSVG(color, num){
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
 function buildRealMap(){
-  if(window.__mapBuilt){ updateMap(); return; }
-  const el = $('#map-container');
-  el.innerHTML = '';
-  const pts = state.locations;
-  const center = pts[0] ? new TMap.LatLng(pts[0].lat, pts[0].lng) : new TMap.LatLng(24.45,118.09);
-  const map = new TMap.Map(el, {
-    center, zoom: 12, viewMode:'2D',
-    baseMap: { type:'vector' }
-  });
-  window.__map = map;
-  window.__mapBuilt = true;
-  updateMap();
+  if(window.__mapBuilt && window.__map){ updateMap(); return; }
+  try{
+    const el = $('#map-container');
+    el.innerHTML = '';
+    const pts = state.locations;
+    const center = pts[0] ? new TMap.LatLng(pts[0].lat, pts[0].lng) : new TMap.LatLng(24.45,118.09);
+    const map = new TMap.Map(el, { center, zoom: 12, viewMode:'2D', baseMap: { type:'vector' } });
+    window.__map = map;
+    window.__mapBuilt = true;
+    updateMap();
+  }catch(e){
+    console.warn('TMap init failed', e);
+    window.__mapFailed = true; window.__mapBuilt = false;
+    fallbackToMock();
+  }
 }
 function updateMap(){
   const map = window.__map;
   if(!map) return;
-  // 销毁旧的覆盖物，避免重复叠加导致卡顿
-  if(window.__markerLayer){ try{window.__markerLayer.setMap(null);}catch(e){} window.__markerLayer=null; }
-  if(window.__lineLayer){  try{window.__lineLayer.setMap(null);}catch(e){}  window.__lineLayer=null;  }
-  const pts = state.locations;
-  if(!pts.length) return;
-  // 标记
-  const layerGeos = { styles:{}, geometries:[] };
-  const lineStyles = {}; const lineGeoms = [];
-  const bounds = new TMap.LatLngBounds();
-  pts.forEach((p, i)=>{
-    const c = colorOf(p.day);
-    const sid = 's'+p.id;
-    layerGeos.styles[sid] = new TMap.MarkerStyle({ width:44, height:56, anchor:{x:22,y:52}, src: makePinSVG(c, i+1) });
-    layerGeos.geometries.push({ id:'p'+p.id, styleId:sid, position:new TMap.LatLng(p.lat,p.lng) });
-    bounds.extend(new TMap.LatLng(p.lat,p.lng));
-  });
-  window.__markerLayer = new TMap.MultiMarker({ map, ...layerGeos });
-  // 连线（按天）
-  const byDay = {};
-  pts.forEach(p=> (byDay[p.day]=byDay[p.day]||[]).push(p));
-  Object.keys(byDay).forEach(d=>{
-    const c = colorOf(+d);
-    const paths = byDay[d].map(p=> new TMap.LatLng(p.lat,p.lng));
-    if(paths.length>=2){
-      lineStyles['line'+d] = new TMap.PolylineStyle({ color:c, width:6, borderWidth:0, lineCap:'round' });
-      lineGeoms.push({ id:'l'+d, styleId:'line'+d, paths });
-    }
-  });
-  if(lineGeoms.length) window.__lineLayer = new TMap.MultiPolyline({ map, styles:lineStyles, geometries:lineGeoms });
-  if(pts.length) map.fitBounds(bounds, { padding: 60 });
+  try{
+    // 销毁旧的覆盖物，避免重复叠加导致卡顿
+    if(window.__markerLayer){ try{window.__markerLayer.setMap(null);}catch(e){} window.__markerLayer=null; }
+    if(window.__lineLayer){  try{window.__lineLayer.setMap(null);}catch(e){}  window.__lineLayer=null;  }
+    const pts = state.locations;
+    if(!pts.length) return;
+    // 标记
+    const layerGeos = { styles:{}, geometries:[] };
+    const lineStyles = {}; const lineGeoms = [];
+    const bounds = new TMap.LatLngBounds();
+    pts.forEach((p, i)=>{
+      const c = colorOf(p.day);
+      const sid = 's'+p.id;
+      layerGeos.styles[sid] = new TMap.MarkerStyle({ width:44, height:56, anchor:{x:22,y:52}, src: makePinSVG(c, i+1) });
+      layerGeos.geometries.push({ id:'p'+p.id, styleId:sid, position:new TMap.LatLng(p.lat,p.lng) });
+      bounds.extend(new TMap.LatLng(p.lat,p.lng));
+    });
+    window.__markerLayer = new TMap.MultiMarker({ map, ...layerGeos });
+    // 连线（按天）
+    const byDay = {};
+    pts.forEach(p=> (byDay[p.day]=byDay[p.day]||[]).push(p));
+    Object.keys(byDay).forEach(d=>{
+      const c = colorOf(+d);
+      const paths = byDay[d].map(p=> new TMap.LatLng(p.lat,p.lng));
+      if(paths.length>=2){
+        lineStyles['line'+d] = new TMap.PolylineStyle({ color:c, width:6, borderWidth:0, lineCap:'round' });
+        lineGeoms.push({ id:'l'+d, styleId:'line'+d, paths });
+      }
+    });
+    if(lineGeoms.length) window.__lineLayer = new TMap.MultiPolyline({ map, styles:lineStyles, geometries:lineGeoms });
+    if(pts.length) map.fitBounds(bounds, { padding: 60 });
+  }catch(e){
+    console.warn('updateMap failed', e);
+    window.__mapFailed = true;
+    fallbackToMock();
+  }
 }
 function renderMap(){
   $('#map-hint-text').textContent = TENCENT_MAP_KEY
-    ? '已配置地图Key · 腾讯地图' : '演示模式：未配置地图Key，显示手绘示意地图';
-  if(TENCENT_MAP_KEY){
-    if(window.__mapBuilt && window.__map){ updateMap(); }
-    else { initRealMap(); }
+    ? (window.__mapFailed ? '地图加载失败，已自动切换为手绘示意' : '已配置地图Key · 腾讯地图') : '演示模式：未配置地图Key，显示手绘示意地图';
+  if(TENCENT_MAP_KEY && !window.__mapFailed){
+    initRealMap();
+  } else {
+    fallbackToMock();
   }
-  else { $('#map-container').style.display='none'; $('#mock-map').style.display='block'; renderMockMap(); }
   renderLegend();
 }
 function renderLegend(){
@@ -738,43 +797,90 @@ function renderItinerary(){
   const el = $('#itinerary-list');
   if(state.locations.length===0){ el.innerHTML='<div class="empty">还没有行程，点左上角「编辑」去添加地点吧 🐰</div>'; return; }
   const blocks = [];
+  let grandTotal = 0;
   for(let d=0; d<state.days; d++){
     const locs = dayLocations(d);
     const sched = scheduleFor(locs);
+    const dayCost = locs.reduce((s,l)=> s + (Number(l.cost)||0), 0);
+    grandTotal += dayCost;
+    const isActive = d === state.activeDay;
     blocks.push(`<div class="day-block" data-day="${d}">
       <div class="day-block-head">
         <span class="mascot small">${MASCOTS[d%MASCOTS.length]}</span>
         <span class="dn">${DAY_NAMES[d]}<b> · ${locs.length} 个地点</b></span>
         <span style="flex:1"></span>
+        <button class="btn sm" data-editday="${d}">${isActive?'✓ 完成编辑':'✎ 编辑'}</button>
         <button class="btn sm" data-export="${d}">🖼 导出本天</button>
       </div>`);
     if(locs.length===0){
       blocks.push(`<div class="empty" style="padding:14px;">这天还没有安排～点下方按钮添加</div>`);
     } else {
-      locs.forEach((l,idx)=>{
-        const s = sched[idx];
-        blocks.push(`<div class="it-item hand hand-c" data-id="${l.id}" style="background:#fff;">
-          <div class="drag">☰</div>
-          <div class="seq" style="background:${colorOf(d)}">${idx+1}</div>
-          <div class="info">
-            <div class="nm">${esc(l.name)}</div>
-            <div class="tm">${s.start} - ${s.end} · 约${l.dur||2}小时</div>
-          </div>
-          <div class="acts">
-            <div class="row">
-              <div class="ibtn up" title="上移">↑</div>
-              <div class="ibtn down" title="下移">↓</div>
-            </div>
-            <div class="row">
-              <div class="ibtn day" title="移到下一天">${d+1}→</div>
-              <div class="ibtn del" title="删除">✕</div>
-            </div>
+      if(isActive){
+        // 摘要条：路线 + 总金额
+        const seqNames = locs.map(l=>l.name).join(' → ');
+        blocks.push(`<div class="it-summary hand">
+          <div class="it-route">📍 ${esc(seqNames)}</div>
+          <div class="it-cost">💰 当天预计：<b>¥${dayCost}</b></div>
+          <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+            <button class="btn blue sm" data-route="nn">🧭 按距离规划路线</button>
+            <button class="btn ghost sm" data-route="reset">↺ 恢复默认顺序</button>
           </div>
         </div>`);
+      }
+      locs.forEach((l,idx)=>{
+        const s = sched[idx];
+        const dur = l.dur || 2;
+        const cost = Number(l.cost) || 0;
+        if(isActive){
+          // 编辑态：可改名称/时长/金额
+          blocks.push(`<div class="it-item hand hand-c" data-id="${l.id}" style="background:#fff;">
+            <div class="drag">☰</div>
+            <div class="seq" style="background:${colorOf(d)}">${idx+1}</div>
+            <div class="info">
+              <input class="it-input it-name" data-field="name" value="${esc(l.name)}" maxlength="20" />
+              <div class="it-meta">
+                <label>⏱ <input class="it-input it-dur" data-field="dur" type="number" min="0.5" step="0.5" value="${dur}" /> 小时</label>
+                <label>💴 <input class="it-input it-cost" data-field="cost" type="number" min="0" step="1" value="${cost}" /> 元</label>
+              </div>
+              <div class="tm">${s.start} - ${s.end}</div>
+            </div>
+            <div class="acts">
+              <div class="row">
+                <div class="ibtn up" title="上移">↑</div>
+                <div class="ibtn down" title="下移">↓</div>
+              </div>
+              <div class="row">
+                <div class="ibtn day" title="移到下一天">${d+1}→</div>
+                <div class="ibtn del" title="删除">✕</div>
+              </div>
+            </div>
+          </div>`);
+        } else {
+          blocks.push(`<div class="it-item hand hand-c" data-id="${l.id}" style="background:#fff;">
+            <div class="drag">☰</div>
+            <div class="seq" style="background:${colorOf(d)}">${idx+1}</div>
+            <div class="info">
+              <div class="nm">${esc(l.name)}</div>
+              <div class="tm">${s.start} - ${s.end} · 约${dur}小时 · ¥${cost}</div>
+            </div>
+            <div class="acts">
+              <div class="row">
+                <div class="ibtn up" title="上移">↑</div>
+                <div class="ibtn down" title="下移">↓</div>
+              </div>
+              <div class="row">
+                <div class="ibtn day" title="移到下一天">${d+1}→</div>
+                <div class="ibtn del" title="删除">✕</div>
+              </div>
+            </div>
+          </div>`);
+        }
       });
     }
     blocks.push(`<button class="btn ghost sm" style="width:100%;" data-addday="${d}">＋ 在${DAY_NAMES[d]}添加地点</button></div>`);
   }
+  // 总金额
+  blocks.push(`<div class="it-grand">🧾 全部行程预计总金额：<b>¥${grandTotal}</b></div>`);
   el.innerHTML = blocks.join('');
 
   // 事件绑定
@@ -784,10 +890,70 @@ function renderItinerary(){
     item.querySelector('.down').onclick = ()=> moveItem(id, 1);
     item.querySelector('.del').onclick  = ()=> { state.locations = state.locations.filter(l=>l.id!==id); save(); renderAll(); };
     item.querySelector('.day').onclick  = ()=> moveItemToNextDay(id);
+    // 编辑态字段
+    const nIn = item.querySelector('.it-name');
+    const dIn = item.querySelector('.it-dur');
+    const cIn = item.querySelector('.it-cost');
+    if(nIn) nIn.onchange = e=>{ updateField(id, 'name', e.target.value.trim() || '未命名地点'); renderAll(); };
+    if(dIn) dIn.onchange = e=>{ updateField(id, 'dur',  Math.max(0.5, Number(e.target.value)||2)); renderAll(); };
+    if(cIn) cIn.onchange = e=>{ updateField(id, 'cost', Math.max(0,   Number(e.target.value)||0)); renderAll(); };
   });
   $$('#itinerary-list [data-addday]').forEach(b=> b.onclick=()=> openAddSheet(+b.dataset.addday));
   $$('#itinerary-list [data-export]').forEach(b=> b.onclick=()=> exportSingleDay(+b.dataset.export));
+  $$('#itinerary-list [data-editday]').forEach(b=> b.onclick=()=>{
+    state.activeDay = +b.dataset.editday; save(); renderAll();
+  });
+  $$('#itinerary-list [data-route]').forEach(b=> b.onclick=()=>{
+    const cmd = b.dataset.route;
+    if(cmd==='nn')     { reorderByDistance(state.activeDay); renderAll(); toast('已按距离重新排序'); }
+    if(cmd==='reset')  { resetDayOrder(state.activeDay);      renderAll(); toast('已恢复默认顺序'); }
+  });
   bindDrag();
+}
+function updateField(id, key, val){
+  const l = state.locations.find(x=>x.id===id);
+  if(!l) return;
+  l[key] = val;
+  save();
+}
+
+/* 最近邻 TSP 排序：固定起点 = 数组当前第一个，其余用最近邻 */
+function reorderByDistance(day){
+  const same = state.locations.filter(l=>l.day===day);
+  if(same.length < 2) return;
+  // 保留第一个不动（用户选择起点），其它按最近邻访问
+  const start = same[0];
+  const rest = same.slice(1).slice();
+  const seq = [start];
+  let cur = start;
+  while(rest.length){
+    let nxt = rest[0], bd = Infinity;
+    rest.forEach(p=>{ const d=dist(cur,p); if(d<bd){bd=d;nxt=p;} });
+    seq.push(nxt);
+    rest.splice(rest.indexOf(nxt),1);
+    cur = nxt;
+  }
+  // 把新顺序写回 state.locations（同一天内）
+  const others = state.locations.filter(l=>l.day!==day);
+  const reordered = others.concat(seq);
+  // 保持其它天的相对顺序稳定：把同天的新顺序插回原范围
+  const firstIdx = state.locations.findIndex(l=>l.day===day);
+  const before = state.locations.slice(0, firstIdx);
+  const after  = state.locations.slice(firstIdx + same.length);
+  state.locations = before.concat(seq).concat(after);
+  save();
+}
+function resetDayOrder(day){
+  // 恢复 DB 中默认顺序（按输入顺序）：当前 state.locations 中同一天的相对顺序维持不变
+  // 这里简单按"从 DB 查到的默认顺序"重排
+  const same = state.locations.filter(l=>l.day===day);
+  const dbOrder = DB.map(d=>d.name);
+  same.sort((a,b)=> dbOrder.indexOf(a.name) - dbOrder.indexOf(b.name));
+  const firstIdx = state.locations.findIndex(l=>l.day===day);
+  const before = state.locations.slice(0, firstIdx);
+  const after  = state.locations.slice(firstIdx + same.length);
+  state.locations = before.concat(same).concat(after);
+  save();
 }
 function moveItem(id, dir){
   const idx = state.locations.findIndex(l=>l.id===id);
@@ -1046,9 +1212,15 @@ function setupPWA(){
 }
 
 /* ---------- ⑰ 初始化 + 事件绑定 ---------- */
+let __inited = false;
 function init(){
+  if(__inited) return;
+  __inited = true;
   setupPWA();
   load();
+  // 兼容旧数据：没有 cost 字段时默认 0
+  state.locations.forEach(l=>{ if(typeof l.cost!=='number') l.cost = 0; });
+  if(state.activeDay < 0 || state.activeDay >= state.days) state.activeDay = 0;
   // 把底部导航挂到 body 下，彻底脱离地图 DOM 树的影响
   document.body.appendChild($('.tabbar'));
   renderSetup();

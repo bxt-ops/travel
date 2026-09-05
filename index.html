@@ -220,6 +220,43 @@ body{
 .btn.sm{padding:8px 12px; font-size:13px; min-height:34px;}
 .btn.blue{background:#5BA8D8; color:#fff;}
 .btn.blue:active{background:#3D8DBE;}
+
+/* ===== 候选地点列表 ===== */
+.sheet-tall{max-height:88vh; display:flex; flex-direction:column;}
+.pick-status{font-size:12px; color:var(--ink-soft); margin:2px 2px 8px; font-weight:700;}
+.pick-list{flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:2px 2px 4px;}
+.pick-item{
+  display:flex; align-items:center; gap:10px; padding:12px 10px; margin-bottom:8px;
+  background:#fff; border:2.5px solid var(--ink); border-radius:14px;
+  cursor:pointer; transition:transform .1s;
+}
+.pick-item:active{transform:scale(.98); background:#FFFDF6;}
+.pick-item .pi-icon{
+  width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+  font-size:22px; background:#FFF6E9; border:2.5px solid var(--ink); flex-shrink:0;
+}
+.pick-item .pi-body{flex:1; min-width:0;}
+.pick-item .pi-name{font-size:15px; font-weight:900; color:var(--ink); display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+.pick-item .pi-area{font-size:11px; background:var(--coral); color:#fff; padding:2px 7px; border-radius:999px; font-weight:800;}
+.pick-item .pi-addr{font-size:12px; color:var(--ink-soft); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.pick-item .pi-meta{font-size:11px; color:var(--ink-soft); margin-top:3px; display:flex; gap:10px; flex-wrap:wrap;}
+.pick-item .pi-meta b{color:var(--ink);}
+.pick-empty{text-align:center; padding:30px 12px; color:var(--ink-soft); font-size:13px;}
+.pick-empty b{color:var(--ink); font-size:15px; display:block; margin-bottom:6px;}
+.pick-footer{display:flex; gap:10px; padding-top:10px; border-top:2px dashed var(--line); margin-top:8px;}
+
+/* ===== 自定义地点表单 ===== */
+.form-row{margin-bottom:10px;}
+.form-row label{display:block; font-size:12px; color:var(--ink-soft); font-weight:800; margin-bottom:4px;}
+.form-row input, .form-row select{
+  width:100%; font:inherit; color:var(--ink);
+  background:#FFFDF6; border:2.5px solid var(--ink); border-radius:12px;
+  padding:10px 12px; outline:none;
+}
+.form-row input:focus, .form-row select:focus{border-color:var(--coral);}
+.form-row.two{display:flex; gap:8px;}
+.form-row.two > div{flex:1;}
+.form-row.two input{width:100%;}
 </style>
 </head>
 <body data-page-node-id="9NasxeMEUA7dbL3XqzRDKc">
@@ -299,17 +336,49 @@ body{
     <div class="tb" data-tab="guide" data-page-node-id="8UB4tW5hRFIBPBKb31Xj19"><span class="ic" data-page-node-id="85DRS0uW5KpHZL6GXX6jVC">📖</span>攻略</div>
   </div>
 
-  <!-- 添加地点弹层 -->
-  <div class="sheet-mask" id="sheet-add" data-page-node-id="bHHlGOt5nPKWWpp9nWbcGS">
-    <div class="sheet" data-page-node-id="0KXW13FEBQrwyi7RJq3bj8">
-      <div class="s-title" data-page-node-id="pFaCG4GWIQeWNch4JIf9mv">🐰 添加地点到 <span id="sheet-day-label" data-page-node-id="kEjEhWXRwxxIy8VP1e2Mq5"></span></div>
-      <div class="field" style="margin-bottom:10px;" data-page-node-id="GVypD2Nhyin2ZcoHU5wYHO">
-        <input id="sheet-input" type="text" placeholder="输入或选择地点" data-page-node-id="ScQe19DBUI9kCBknj1CEgN">
+  <!-- 候选地点弹层 -->
+  <div class="sheet-mask" id="sheet-pick" data-page-node-id="bHHlGOt5nPKWWpp9nWbcGS">
+    <div class="sheet sheet-tall" data-page-node-id="0KXW13FEBQrwyi7RJq3bj8">
+      <div class="s-title" data-page-node-id="pFaCG4GWIQeWNch4JIf9mv">
+        <span class="mascot small">🐰</span> 选择地点加入 <span id="pick-day-label" data-page-node-id="kEjEhWXRwxxIy8VP1e2Mq5"></span>
       </div>
-      <div class="chips" id="sheet-suggest" style="margin-bottom:12px;" data-page-node-id="C4s8Np3EzdGNGIAAZfTQBj"></div>
-      <div style="display:flex; gap:10px;" data-page-node-id="cdKYtsppMMmDSEMzDZqpWY">
-        <button class="btn ghost" id="btn-sheet-cancel" style="flex:1;" data-page-node-id="4HmKZOT7DhO3BxvJM1VUTS">取消</button>
-        <button class="btn primary" id="btn-sheet-confirm" style="flex:1;" data-page-node-id="N38V8XZ4FJxJ8Z2xGKtqpF">确定添加</button>
+      <div class="field" style="margin-bottom:10px;" data-page-node-id="GVypD2Nhyin2ZcoHU5wYHO">
+        <input id="pick-input" type="search" placeholder="搜索地点名 / 区域 / 类型" enterkeyhint="search" data-page-node-id="ScQe19DBUI9kCBknj1CEgN">
+        <button class="btn primary" id="btn-pick-search" data-page-node-id="vj9VK6UgJpWchUZromjoWZ">搜索</button>
+      </div>
+      <div class="pick-status" id="pick-status" data-page-node-id="d24hyateSCH4c75FTrbEP8">本地候选 · 点击选择</div>
+      <div class="pick-list" id="pick-list" data-page-node-id="p91fyUMNj3qoJNMylneh7v"></div>
+      <div class="pick-footer" data-page-node-id="cdKYtsppMMmDSEMzDZqpWY">
+        <button class="btn ghost" id="btn-pick-cancel" style="flex:1;" data-page-node-id="4HmKZOT7DhO3BxvJM1VUTS">取消</button>
+        <button class="btn primary" id="btn-pick-custom" style="flex:1;" data-page-node-id="N38V8XZ4FJxJ8Z2xGKtqpF">＋ 自定义地点</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 自定义地点弹层 -->
+  <div class="sheet-mask" id="sheet-custom" data-page-node-id="bHHlGOt5nPKWWpp9nWbcGS">
+    <div class="sheet" data-page-node-id="0KXW13FEBQrwyi7RJq3bj8">
+      <div class="s-title" data-page-node-id="pFaCG4GWIQeWNch4JIf9mv">✏️ 自定义地点 → <span id="custom-day-label"></span></div>
+      <div class="form-row"><label>地点名称</label><input id="cf-name" type="text" placeholder="例如：我家楼下" maxlength="20"></div>
+      <div class="form-row"><label>所在区域</label><input id="cf-area" type="text" placeholder="例如：思明区" maxlength="20"></div>
+      <div class="form-row"><label>详细地址</label><input id="cf-addr" type="text" placeholder="街道、门牌号" maxlength="40"></div>
+      <div class="form-row two">
+        <div><label>经度 (lng)</label><input id="cf-lng" type="number" step="0.0001" placeholder="118.09"></div>
+        <div><label>纬度 (lat)</label><input id="cf-lat" type="number" step="0.0001" placeholder="24.44"></div>
+      </div>
+      <div class="form-row two">
+        <div><label>游览时长 (h)</label><input id="cf-dur" type="number" min="0.5" step="0.5" value="2"></div>
+        <div><label>预计金额 (¥)</label><input id="cf-cost" type="number" min="0" step="1" value="0"></div>
+      </div>
+      <div class="form-row"><label>地点类型</label>
+        <select id="cf-type">
+          <option>景点</option><option>餐厅</option><option>酒店</option>
+          <option>咖啡店</option><option>购物</option><option>交通</option><option>其他</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:14px;">
+        <button class="btn ghost" id="btn-custom-back" style="flex:1;">← 返回候选</button>
+        <button class="btn primary" id="btn-custom-save" style="flex:1;">✓ 保存并加入</button>
       </div>
     </div>
   </div>
@@ -378,6 +447,99 @@ const DB = [
    food:['集美大社沙茶面','学村小吃'],
    tip:'嘉庚建筑群很有特色；地铁跨海段被称「海上小火车」'}
 ];
+
+/* ---------- ③b 本地候选池（同名不同区，含酒店/餐厅/景点/购物 等类型） ----------
+   字段：name, area, address, lat, lng, type, dur, transport, food, tip
+*/
+const POI_TYPES = ['景点','餐厅','酒店','咖啡店','购物','交通','其他'];
+const POI_DB = [
+  // 鼓浪屿景点细分
+  {name:'鼓浪屿', area:'思明区', address:'厦门市思明区鼓浪屿', lat:24.4476, lng:118.0650, type:'景点', dur:5, transport:'从厦鼓码头乘轮渡上岛', food:['叶氏麻糍','龙头鱼丸汤'], tip:'登日光岩俯瞰全景'},
+  {name:'鼓浪屿', area:'思明区', address:'鼓浪屿钢琴博物馆', lat:24.4502, lng:118.0690, type:'景点', dur:1.5, transport:'岛上步行', food:['张三疯奶茶'], tip:'听一场古典钢琴演奏'},
+  {name:'鼓浪屿', area:'思明区', address:'鼓浪屿日光岩景区', lat:24.4493, lng:118.0680, type:'景点', dur:2, transport:'岛上步行', food:['龙头路小吃'], tip:'鼓浪屿最高点，日落前上山最佳'},
+
+  // 厦门大学
+  {name:'厦门大学', area:'思明区', address:'思明区思明南路422号', lat:24.4347, lng:118.0930, type:'景点', dur:2.5, transport:'公交/打车', food:['芙蓉餐厅'], tip:'提前公众号预约入校'},
+  {name:'厦门大学', area:'思明区', address:'思明区思明南路(白城校门)', lat:24.4260, lng:118.1010, type:'景点', dur:1, transport:'白城校门入校', food:['白城沙滩边小摊'], tip:'白城校门近环岛路、白城沙滩'},
+
+  // 沙坡尾
+  {name:'沙坡尾', area:'思明区', address:'思明区大学路沙坡尾', lat:24.4350, lng:118.0790, type:'景点', dur:2, transport:'公交/骑行', food:['避风坞海鲜'], tip:'避风坞夕阳超美'},
+
+  // 植物园
+  {name:'植物园', area:'思明区', address:'思明区虎园路25号', lat:24.4510, lng:118.0970, type:'景点', dur:3, transport:'公交至西门', food:['周边素菜馆'], tip:'雨林喷雾区必打卡'},
+
+  // 环岛路
+  {name:'环岛路', area:'思明区', address:'思明区环岛路', lat:24.4280, lng:118.1310, type:'景点', dur:3, transport:'租共享单车', food:['曾厝垵小吃'], tip:'傍晚骑行看日落'},
+
+  // 同名「中山路」/「沙茶面」等多区样本（演示同名不同区）
+  {name:'中山路', area:'思明区', address:'思明区中山路步行街', lat:24.4565, lng:118.0770, type:'购物', dur:2, transport:'地铁1号线', food:['黄则和花生汤','局口拌面'], tip:'骑楼老街夜景美'},
+  {name:'中山路', area:'集美区', address:'集美区杏滨街道中山路', lat:24.5760, lng:118.1050, type:'购物', dur:1, transport:'公交/打车', food:['集美小吃'], tip:'集美学村老商圈，骑行可达'},
+
+  {name:'沙茶面', area:'思明区', address:'思明区局口街', lat:24.4570, lng:118.0770, type:'餐厅', dur:0.5, transport:'地铁1号线', food:['沙茶面'], tip:'局口街老字号沙茶面'},
+  {name:'沙茶面', area:'湖里区', address:'湖里区万达广场', lat:24.5140, lng:118.1140, type:'餐厅', dur:0.5, transport:'地铁2号线', food:['沙茶面','海鲜'], tip:'湖里万达附近多家分店'},
+  {name:'沙茶面', area:'集美区', address:'集美区石鼓路', lat:24.5750, lng:118.1050, type:'餐厅', dur:0.5, transport:'地铁1号线', food:['沙茶面'], tip:'学生街平价选择'},
+
+  // 同名「星巴克」/「酒店」等
+  {name:'星巴克', area:'思明区', address:'思明区中山路店', lat:24.4560, lng:118.0780, type:'咖啡店', dur:0.5, transport:'地铁1号线', food:['咖啡'], tip:'骑楼风窗边位'},
+  {name:'星巴克', area:'湖里区', address:'湖里区万达广场店', lat:24.5140, lng:118.1140, type:'咖啡店', dur:0.5, transport:'地铁2号线', food:['咖啡'], tip:'逛街歇脚好去处'},
+
+  {name:'如家酒店', area:'思明区', address:'思明区火车站附近', lat:24.4700, lng:118.0820, type:'酒店', dur:0, transport:'公交/打车', food:[], tip:'经济型连锁'},
+  {name:'如家酒店', area:'湖里区', address:'湖里区SM广场附近', lat:24.5100, lng:118.1160, type:'酒店', dur:0, transport:'公交', food:[], tip:'SM 广场购物便利'},
+
+  // 其他景点
+  {name:'曾厝垵', area:'思明区', address:'思明区曾厝垵', lat:24.4250, lng:118.1280, type:'景点', dur:2.5, transport:'公交', food:['蚵仔煎','土笋冻'], tip:'小渔村改造的文艺街区'},
+  {name:'南普陀寺', area:'思明区', address:'思明区思明南路515号', lat:24.4450, lng:118.0900, type:'景点', dur:1.5, transport:'步行/公交', food:['南普陀素饼'], tip:'免费开放，素斋有名'},
+  {name:'胡里山炮台', area:'思明区', address:'思明区环岛路胡里山', lat:24.4280, lng:118.1080, type:'景点', dur:1.5, transport:'公交', food:['附近海鲜'], tip:'看世界最大海岸炮'},
+  {name:'白城沙滩', area:'思明区', address:'思明区环岛路白城', lat:24.4260, lng:118.1010, type:'景点', dur:1.5, transport:'公交/步行', food:['椰子小摊'], tip:'看日落'},
+  {name:'集美学村', area:'集美区', address:'集美区银江路', lat:24.5660, lng:118.1010, type:'景点', dur:3, transport:'地铁1号线', food:['大社沙茶面'], tip:'嘉庚建筑群'},
+  // 交通
+  {name:'厦门站', area:'思明区', address:'思明区站南路1号', lat:24.4700, lng:118.0820, type:'交通', dur:0, transport:'地铁/公交', food:[], tip:'火车站'},
+  {name:'厦门北站', area:'集美区', address:'集美区岩兴路', lat:24.6200, lng:118.0260, type:'交通', dur:0, transport:'地铁1号线', food:[], tip:'高铁站'},
+
+  // ========== 同名连锁品牌（本地备用库，每个 3 个分店示例） ==========
+  {name:'瑞幸咖啡', area:'思明区', address:'思明区中山路店', lat:24.4565, lng:118.0770, type:'咖啡店', dur:0.5, transport:'地铁1号线中山路', food:['拿铁','美式'], tip:'24h营业'},
+  {name:'瑞幸咖啡', area:'湖里区', address:'湖里区万达广场店', lat:24.5140, lng:118.1140, type:'咖啡店', dur:0.5, transport:'地铁2号线', food:['拿铁'], tip:'万达广场一层'},
+  {name:'瑞幸咖啡', area:'集美区', address:'集美区万达广场店', lat:24.5750, lng:118.1050, type:'咖啡店', dur:0.5, transport:'地铁1号线', food:['拿铁'], tip:'集美万达'},
+  {name:'瑞幸咖啡', area:'思明区', address:'思明区厦门大学店', lat:24.4347, lng:118.0930, type:'咖啡店', dur:0.5, transport:'公交', food:['美式','生椰'], tip:'厦大附近'},
+  {name:'瑞幸咖啡', area:'思明区', address:'思明区软件园二期店', lat:24.4900, lng:118.1550, type:'咖啡店', dur:0.5, transport:'公交', food:[], tip:'上班高峰排队'},
+
+  {name:'麦当劳', area:'思明区', address:'思明区中山路店', lat:24.4560, lng:118.0780, type:'餐厅', dur:0.5, transport:'地铁1号线', food:['巨无霸','麦辣鸡腿堡'], tip:'24h'},
+  {name:'麦当劳', area:'湖里区', address:'湖里区SM广场店', lat:24.5100, lng:118.1170, type:'餐厅', dur:0.5, transport:'地铁1号线', food:['开心乐园餐'], tip:'儿童乐园'},
+  {name:'麦当劳', area:'集美区', address:'集美区万达广场店', lat:24.5750, lng:118.1050, type:'餐厅', dur:0.5, transport:'公交', food:['麦辣鸡翅'], tip:'学生常去'},
+
+  {name:'肯德基', area:'思明区', address:'思明区中华城店', lat:24.4580, lng:118.0820, type:'餐厅', dur:0.5, transport:'公交', food:['全家桶','吮指原味鸡'], tip:'早餐6点起'},
+  {name:'肯德基', area:'湖里区', address:'湖里区万达广场店', lat:24.5140, lng:118.1140, type:'餐厅', dur:0.5, transport:'公交', food:['炸鸡'], tip:'逛街歇脚'},
+  {name:'肯德基', area:'思明区', address:'思明区火车站店', lat:24.4700, lng:118.0820, type:'餐厅', dur:0.5, transport:'地铁', food:['早餐'], tip:'赶车快速'},
+
+  {name:'喜茶', area:'思明区', address:'思明区中华城店', lat:24.4575, lng:118.0810, type:'咖啡店', dur:0.5, transport:'公交', food:['多肉葡萄','芝芝莓莓'], tip:'可能排队'},
+  {name:'喜茶', area:'湖里区', address:'湖里区SM广场店', lat:24.5110, lng:118.1170, type:'咖啡店', dur:0.5, transport:'公交', food:['多肉葡萄'], tip:'二楼靠窗'},
+  {name:'喜茶', area:'集美区', address:'集美区万达广场店', lat:24.5750, lng:118.1050, type:'咖啡店', dur:0.5, transport:'公交', food:['多肉葡萄'], tip:'网红款常断货'},
+
+  {name:'海底捞', area:'思明区', address:'思明区SM城市广场店', lat:24.5090, lng:118.1180, type:'餐厅', dur:1.5, transport:'公交', food:['麻辣鸳鸯锅','虾滑'], tip:'等位时间长建议工作日'},
+  {name:'海底捞', area:'湖里区', address:'湖里区万达广场店', lat:24.5140, lng:118.1140, type:'餐厅', dur:1.5, transport:'公交', food:['番茄锅'], tip:'24h营业'},
+  {name:'海底捞', area:'思明区', address:'思明区火车站店', lat:24.4700, lng:118.0820, type:'餐厅', dur:1.5, transport:'地铁', food:['麻辣锅'], tip:'深夜堂食首选'},
+
+  {name:'汉庭酒店', area:'思明区', address:'思明区火车站店', lat:24.4710, lng:118.0830, type:'酒店', dur:0, transport:'公交', food:[], tip:'24h前台'},
+  {name:'汉庭酒店', area:'湖里区', address:'湖里区SM广场店', lat:24.5090, lng:118.1180, type:'酒店', dur:0, transport:'公交', food:[], tip:'经济型'},
+  {name:'汉庭酒店', area:'集美区', address:'集美区万达广场店', lat:24.5750, lng:118.1050, type:'酒店', dur:0, transport:'公交', food:[], tip:'学村附近'},
+
+  {name:'7天酒店', area:'思明区', address:'思明区中山路店', lat:24.4565, lng:118.0770, type:'酒店', dur:0, transport:'地铁1号线', food:[], tip:'位置方便'},
+  {name:'7天酒店', area:'湖里区', address:'湖里区万达广场店', lat:24.5140, lng:118.1140, type:'酒店', dur:0, transport:'公交', food:[], tip:'商旅常选'},
+  {name:'7天酒店', area:'集美区', address:'集美区石鼓路店', lat:24.5750, lng:118.1060, type:'酒店', dur:0, transport:'公交', food:[], tip:'学生街对面'},
+
+  {name:'蜜雪冰城', area:'思明区', address:'思明区沙坡尾店', lat:24.4350, lng:118.0790, type:'咖啡店', dur:0.3, transport:'公交', food:['柠檬水','冰淇淋'], tip:'平价'},
+  {name:'蜜雪冰城', area:'湖里区', address:'湖里区SM广场店', lat:24.5090, lng:118.1180, type:'咖啡店', dur:0.3, transport:'公交', food:['柠檬水'], tip:'学生常去'},
+  {name:'蜜雪冰城', area:'集美区', address:'集美区万达店', lat:24.5750, lng:118.1050, type:'咖啡店', dur:0.3, transport:'公交', food:['柠檬水'], tip:'便宜大杯'}
+];
+
+function isPOIMatch(poi, q){
+  if(!q) return true;
+  q = q.toLowerCase();
+  return poi.name.toLowerCase().includes(q)
+      || (poi.area||'').toLowerCase().includes(q)
+      || (poi.address||'').toLowerCase().includes(q)
+      || (poi.type||'').toLowerCase().includes(q);
+}
 
 /* ---------- ④ 状态 ---------- */
 const STORE_KEY = 'chufaba_travel_plan_v1';
@@ -555,9 +717,17 @@ function renderSetup(){
   $('#day-num').textContent = state.days;
 }
 function addFromInput(){
-  const inp = $('#loc-input'); const v = inp.value.trim();
+  const inp = $('#loc-input');
+  const v = inp.value.trim();
   if(!v){ toast('请输入地点名'); return; }
-  addLocation(v, 0); inp.value=''; renderSetup(); toast('已添加 '+v);
+  // 改为走候选弹窗：让用户选择具体地点
+  openCandidatePicker({ prefill: v, day: 0, onPick: (poi)=>{
+    state.locations.push({ ...poi, id: uid(), day: 0, cost: poi.cost||0 });
+    save();
+    inp.value='';
+    renderSetup();
+    toast('已添加 '+poi.name+(poi.area?('（'+poi.area+'）'):''));
+  }});
 }
 
 /* ---------- ⑨ 渲染：主界面 ---------- */
@@ -1062,32 +1232,254 @@ function renderGuide(){
   el.innerHTML = out.join('');
 }
 
-/* ---------- ⑬ 添加地点弹层 ---------- */
-let sheetDay = 0, sheetPick = null;
+/* ---------- ⑬ 添加地点弹层（候选 + 自定义） ---------- */
+let sheetDay = 0;
+let pickDay  = 0;
+let pickOnPick = null;
+let pickCurrentList = [];     // 当前展示的候选数组
+
 function openAddSheet(day){
-  sheetDay = day; sheetPick=null;
-  $('#sheet-day-label').textContent = DAY_NAMES[day];
-  $('#sheet-input').value='';
-  renderSheetSuggest('');
-  $('#sheet-add').classList.add('show');
+  openCandidatePicker({ prefill: '', day, onPick: (poi)=>{
+    state.locations.push({ ...poi, id: uid(), day, cost: poi.cost||0 });
+    save(); renderAll();
+    toast('已添加到 '+DAY_NAMES[day]+'：'+(poi.name+(poi.area?('（'+poi.area+'）'):'')));
+  }});
 }
-function renderSheetSuggest(q){
-  const el = $('#sheet-suggest');
-  let items = DB;
-  if(q) items = DB.filter(d=>d.name.includes(q)||(d.alias&&d.alias.includes(q)));
-  else items = DB.slice(0,8);
-  el.innerHTML = items.map(d=>`<span class="chip ${sheetPick===d.name?'add':''}" data-pick="${esc(d.name)}">${esc(d.name)}</span>`).join('');
-  $$('#sheet-suggest .chip').forEach(c=> c.onclick=()=>{ sheetPick=c.dataset.pick; $('#sheet-input').value=c.dataset.pick; renderSheetSuggest(c.dataset.pick); });
+
+/* ========== 候选选择弹窗 ========== */
+function openCandidatePicker(opts){
+  pickDay = opts.day;
+  pickOnPick = opts.onPick || null;
+  $('#pick-day-label').textContent = DAY_NAMES[opts.day] || '';
+  $('#pick-input').value = opts.prefill || '';
+  pickCurrentList = [];
+  renderPickStatus('本地候选 · 点击选择');
+  renderPickList(localSearch(opts.prefill || ''));
+  $('#sheet-pick').classList.add('show');
+  setTimeout(()=>$('#pick-input').focus(), 50);
 }
-$('#sheet-input').addEventListener('input', e=> renderSheetSuggest(e.target.value.trim()));
-$('#btn-sheet-cancel').onclick = ()=> $('#sheet-add').classList.remove('show');
-$('#btn-sheet-confirm').onclick = ()=>{
-  const v = $('#sheet-input').value.trim();
-  if(!v){ toast('请选择或输入地点'); return; }
-  addLocation(v, sheetDay);
-  $('#sheet-add').classList.remove('show');
-  renderAll(); toast('已添加到 '+DAY_NAMES[sheetDay]);
-};
+function closePick(){ $('#sheet-pick').classList.remove('show'); pickOnPick=null; }
+
+function localSearch(q){
+  q = (q||'').trim().toLowerCase();
+  if(!q) return POI_DB.slice(0, 20);
+  // 名称/区域/地址/类型任一匹配；同名的都会列出
+  return POI_DB.filter(p=> isPOIMatch(p, q)).slice(0, 50);
+}
+function renderPickList(list){
+  pickCurrentList = list || [];
+  const el = $('#pick-list');
+  if(!pickCurrentList.length){
+    el.innerHTML = `<div class="pick-empty">
+      <b>没有匹配到 "${esc($('#pick-input').value)}"</b>
+      点下方"自定义地点"手动添加，或换个关键词试试
+    </div>`;
+    return;
+  }
+  el.innerHTML = pickCurrentList.map((p,i)=>{
+    const ico = ({'景点':'🗺','餐厅':'🍜','酒店':'🛏','咖啡店':'☕','购物':'🛍','交通':'🚉','其他':'📍'})[p.type] || '📍';
+    return `<div class="pick-item" data-idx="${i}">
+      <div class="pi-icon">${ico}</div>
+      <div class="pi-body">
+        <div class="pi-name">${esc(p.name)}${p.area?`<span class="pi-area">${esc(p.area)}</span>`:''}</div>
+        <div class="pi-addr">${esc(p.address||'')}</div>
+        <div class="pi-meta">
+          <span>类型：<b>${esc(p.type||'其他')}</b></span>
+          <span>经纬度：<b>${(+p.lat).toFixed(4)}, ${(+p.lng).toFixed(4)}</b></span>
+          ${p.dur?`<span>建议：<b>${p.dur}小时</b></span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  // 绑定点击：选择该候选
+  $$('#pick-list .pick-item').forEach(node=>{
+    node.onclick = ()=>{
+      const p = pickCurrentList[+node.dataset.idx];
+      if(!p) return;
+      const poi = {
+        name: p.name, area: p.area||'', address: p.address||'',
+        lat: +p.lat, lng: +p.lng, type: p.type||'其他',
+        dur: p.dur||2, cost: 0,
+        transport: p.transport||'公共交通或打车前往',
+        food: p.food||[], tip: p.tip||'出发前查好开放时间'
+      };
+      if(pickOnPick) pickOnPick(poi);
+      closePick();
+    };
+  });
+}
+function renderPickStatus(text){ $('#pick-status').textContent = text; }
+
+/* ========== 远程搜索（腾讯 WebService，8s 超时，失败回退本地，并给出具体原因） ========== */
+const POI_SEARCH_TIMEOUT_MS = 8000;
+/**
+ * 封装腾讯 WebService 搜索调用
+ * - 关键：腾讯在 status 非 0（如 121 配额超限、310 Key 无效）时返回纯 JSON body，
+ *   JSONP 的 callback 永远不会被调用。如果只监听 onerror / callback，就会出现「静默超时」。
+ *   所以这里额外监听 onload，拿到 body 后 JSON.parse，提取真实状态。
+ *
+ * resolve 永远返回一个对象：{ ok, data, error, status, message, reason }
+ *   ok=true  表示拿到 status:0 + data[]
+ *   ok=false 表示失败（含网络、超时、配额、Key 无效等），UI 可读 error/message 展示真实原因
+ */
+function searchRemotePOI(q){
+  return new Promise((resolve)=>{
+    if(!q){ resolve({ ok:false, reason:'empty' }); return; }
+    if(!TENCENT_MAP_KEY){ resolve({ ok:false, reason:'no-key' }); return; }
+    const cbName = '__poi_cb_' + Math.random().toString(36).slice(2,8);
+    let script = null;
+    let resolved = false;
+    const done = (val)=>{
+      if(resolved) return;
+      resolved = true;
+      try{ delete window[cbName]; }catch(e){}
+      try{ if(script && script.parentNode) script.parentNode.removeChild(script); }catch(e){}
+      clearTimeout(timer);
+      resolve(val);
+    };
+    const timer = setTimeout(()=> done({ ok:false, reason:'timeout', message:'请求超过 8 秒未返回（网络或 CDN 卡顿）' }), POI_SEARCH_TIMEOUT_MS);
+    window[cbName] = (data)=>{
+      if(data && data.status === 0 && Array.isArray(data.data)){
+        done({ ok:true, data: data.data, raw: data });
+      } else {
+        done({ ok:false, status: data && data.status, message: data && data.message, raw: data });
+      }
+    };
+    script = document.createElement('script');
+    const baseUrl = `https://apis.map.qq.com/ws/place/v1/search?keyword=${encodeURIComponent(q)}&boundary=region(厦门,0)&key=${encodeURIComponent(TENCENT_MAP_KEY)}&page_size=15&output=jsonp`;
+    let networkErr = false;
+    script.onerror = ()=>{ networkErr = true; done({ ok:false, reason:'network', message:'网络异常，无法访问腾讯 WebService（跨域 / DNS / 离线）' }); };
+    script.onload = ()=>{
+      // 关键：若 callback 已调用过，直接返回。否则 body 是纯 JSON，手动 parse 拿真实错误
+      if(resolved) return;
+      let text = '';
+      try{ text = script && script.textContent ? script.textContent : ''; }catch(e){}
+      // <script> 加载纯 JSON 后 textContent 就是完整 body
+      const m = text.match(/\{[\s\S]*\}/);
+      if(m){
+        try{
+          const parsed = JSON.parse(m[0]);
+          if(parsed && typeof parsed.status === 'number'){
+            done({ ok:false, status:parsed.status, message:parsed.message || '', raw:parsed });
+            return;
+          }
+        }catch(e){}
+      }
+      // 兜底：body 不是 JSON 也不是 JSONP → 标记为异常
+      done({ ok:false, reason:'no-callback', message:'腾讯返回了无法解析的内容（可能被 WebService 拦截或命中风控）' });
+    };
+    script.src = baseUrl + '&callback=' + cbName + '&_t=' + Date.now();
+    document.head.appendChild(script);
+  });
+}
+
+async function onPickSearch(){
+  const q = $('#pick-input').value.trim();
+  if(!q){
+    renderPickList(localSearch(''));
+    renderPickStatus('本地候选 · 数量 ' + POI_DB.length + ' 条');
+    return;
+  }
+  renderPickStatus('搜索中…');
+  const localList = localSearch(q);
+  const remote = await searchRemotePOI(q);
+  let list = localList;
+  let usedRemote = false;
+  let remoteItems = [];
+  let remoteErrorInfo = null;
+
+  if(remote && remote.ok){
+    remoteItems = remote.data.map(d=>({
+      name: d.title || q,
+      area: d.adname || (d.district && d.district.replace('区','')) || '',
+      address: d.address || '',
+      lat: d.location && d.location.lat,
+      lng: d.location && d.location.lng,
+      type: d.category || '其他',
+      dur: 2,
+      transport: '公共交通或打车前往',
+      food: [],
+      tip: '来源：腾讯地图（实时）',
+      _remote: true
+    })).filter(x=> isFinite(x.lat) && isFinite(x.lng));
+    // 远程优先 + 远程没覆盖到的本地候选（同名也按地址去重）
+    const rKey = s=> (s.name+'|'+(s.address||'')).toLowerCase();
+    const rKeys = new Set(remoteItems.map(rKey));
+    list = remoteItems.concat(localList.filter(p=> !rKeys.has(rKey(p))));
+    usedRemote = true;
+  } else {
+    // 远程失败：把原因存下来，等下传给 UI
+    remoteErrorInfo = remote || { ok:false, reason:'unknown', message:'未知错误' };
+    list = localList;
+  }
+
+  renderPickList(list);
+  if(usedRemote){
+    renderPickStatus(`✅ 腾讯地图 · ${remoteItems.length} 条（本地备用 ${localList.length} 条已合并）`);
+  } else if(remoteErrorInfo){
+    const r = remoteErrorInfo;
+    let msg = '';
+    if(r.reason === 'timeout')        msg = `⏱ 远程搜索超时（${POI_SEARCH_TIMEOUT_MS/1000}s），已显示本地 ${localList.length} 条候选`;
+    else if(r.reason === 'network')   msg = `🌐 网络异常无法访问腾讯 WebService，已显示本地 ${localList.length} 条候选`;
+    else if(r.reason === 'no-key')    msg = `本地候选 ${localList.length} 条 · 提示：尚未配置地图 Key`;
+    else if(r.reason === 'empty')     msg = `本地候选 ${localList.length} 条`;
+    else if(r.reason === 'no-callback') msg = `⚠️ 腾讯返回异常，已显示本地 ${localList.length} 条候选：${r.message||''}`;
+    else if(r.status === 121)         msg = `⚠️ 腾讯地图 WebService 当日调用量已达上限（status=121），已显示本地 ${localList.length} 条候选，明日 0 点自动恢复`;
+    else if(r.status === 310 || r.status === 311) msg = `⚠️ 腾讯地图 Key 无效或未启用「WebService API」（status=${r.status}），已显示本地 ${localList.length} 条候选`;
+    else if(r.status === 306 || r.status === 308) msg = `⚠️ 腾讯地图 IP / 域名白名单限制（status=${r.status}），已显示本地 ${localList.length} 条候选`;
+    else                              msg = `⚠️ 腾讯地图返回 status=${r.status}：${r.message||''}，已显示本地 ${localList.length} 条候选`;
+    renderPickStatus(msg);
+  }
+}
+
+/* ========== 自定义地点表单 ========== */
+let customDay = 0;
+let customOnSave = null;
+function openCustomPOIForm(opts){
+  customDay = opts.day;
+  customOnSave = opts.onSave || null;
+  $('#custom-day-label').textContent = DAY_NAMES[opts.day] || '';
+  $('#cf-name').value  = opts.prefill?.name  || $('#pick-input').value || '';
+  $('#cf-area').value  = opts.prefill?.area  || '';
+  $('#cf-addr').value  = opts.prefill?.addr  || '';
+  $('#cf-lng').value   = opts.prefill?.lng   ?? '';
+  $('#cf-lat').value   = opts.prefill?.lat   ?? '';
+  $('#cf-dur').value   = opts.prefill?.dur   || 2;
+  $('#cf-cost').value  = opts.prefill?.cost  || 0;
+  $('#cf-type').value  = opts.prefill?.type  || '景点';
+  $('#sheet-pick').classList.remove('show');
+  $('#sheet-custom').classList.add('show');
+}
+function closeCustom(){ $('#sheet-custom').classList.remove('show'); }
+function saveCustomPOI(){
+  const name = $('#cf-name').value.trim();
+  if(!name){ toast('请输入地点名称'); return; }
+  const lng = Number($('#cf-lng').value);
+  const lat = Number($('#cf-lat').value);
+  if(!isFinite(lat) || !isFinite(lng)){
+    toast('请填入有效的经纬度（数字）');
+    return;
+  }
+  if(lat<-90||lat>90||lng<-180||lng>180){
+    toast('经纬度超出有效范围');
+    return;
+  }
+  const poi = {
+    name,
+    area:   $('#cf-area').value.trim(),
+    address:$('#cf-addr').value.trim(),
+    lat, lng,
+    type:   $('#cf-type').value,
+    dur:    Math.max(0.5, Number($('#cf-dur').value)||2),
+    cost:   Math.max(0,   Number($('#cf-cost').value)||0),
+    transport:'自定义地点', food:[], tip:''
+  };
+  if(customOnSave) customOnSave(poi);
+  closeCustom();
+  if(!pickOnPick){ /* 从 #sheet-add 旧入口来 */ }
+  pickOnPick = null;
+  customOnSave = null;
+}
 
 /* ---------- ⑭ 导出图片 ---------- */
 function svgEsc(s){ return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -1229,12 +1621,39 @@ function init(){
   if(state.locations.length){ showMain(); }
 
   $('#btn-add').onclick = addFromInput;
-  $('#loc-input').addEventListener('keydown', e=>{ if(e.key==='Enter') addFromInput(); });
+  $('#loc-input').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); addFromInput(); } });
   $('#day-minus').onclick = ()=>{ if(state.days>1){ state.days--; save(); renderSetup(); } };
   $('#day-plus').onclick  = ()=>{ if(state.days<8){ state.days++; save(); renderSetup(); } };
   $('#btn-generate').onclick = generatePlan;
   $('#btn-back').onclick = backToSetup;
   $$('.tabbar .tb').forEach(b=> b.onclick=()=>switchTab(b.dataset.tab));
+
+  // —— 候选弹窗事件 ——
+  $('#btn-pick-cancel').onclick = closePick;
+  $('#btn-pick-search').onclick = onPickSearch;
+  $('#btn-pick-custom').onclick = ()=>{
+    // 把当前关键词带过去，便于预填名称
+    openCustomPOIForm({
+      day: pickDay,
+      onSave: (poi)=>{
+        if(pickOnPick) pickOnPick(poi);
+        customOnSave = null;
+        pickOnPick = null;
+      }
+    });
+  };
+  $('#pick-input').addEventListener('input', e=>{
+    // 输入即本地实时筛选，键入搜索按钮才走远程
+    renderPickList(localSearch(e.target.value.trim()));
+    renderPickStatus('本地候选 · 点击选择');
+  });
+  $('#pick-input').addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); onPickSearch(); }
+  });
+
+  // —— 自定义地点弹窗事件 ——
+  $('#btn-custom-back').onclick = ()=>{ closeCustom(); $('#sheet-pick').classList.add('show'); };
+  $('#btn-custom-save').onclick = saveCustomPOI;
 
   // 单天导出按钮（行程页顶部常驻一个）
   const itin = $('#itinerary-list');

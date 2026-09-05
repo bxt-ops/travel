@@ -561,7 +561,7 @@ function renderDayChips(){
         return `<span class="daychip ${d===state.activeDay?'active':''}" data-day="${d}"
           style="${d===state.activeDay?('background:'+colorOf(d)):''}">${DAY_NAMES[d]} · ${n}地</span>`;
       }).join('');
-    $$(el+' .daychip').forEach(c=> c.onclick=()=>{ state.activeDay=+c.dataset.day; renderDayChips(); renderMap(); renderItinerary(); });
+    el.querySelectorAll('.daychip').forEach(c=> c.onclick=()=>{ state.activeDay=+c.dataset.day; renderDayChips(); renderMap(); renderItinerary(); });
   };
   mk('map','#map-daychips');
 }

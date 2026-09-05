@@ -157,11 +157,12 @@ body{
 .g-para{font-size:13px; line-height:1.7; color:var(--ink);}
 /* 底部导航 */
 .tabbar{
-  position:fixed; left:0; right:0; bottom:0; z-index:1000;
+  position:fixed; left:0; right:0; bottom:0; z-index:99999;
   display:none; background:var(--paper2); border-top:3px solid var(--ink);
   padding-bottom:var(--safe-bottom); pointer-events:auto;
+  transform:translateZ(0); -webkit-transform:translateZ(0);
 }
-#view-main.active ~ .tabbar{display:flex;}
+.tabbar.show{display:flex;}
 .tabbar .tb{flex:1; text-align:center; padding:10px 0 8px; cursor:pointer; font-size:12px; font-weight:800; color:var(--ink-soft); position:relative;}
 .tabbar .tb .ic{font-size:22px; display:block; margin-bottom:2px;}
 .tabbar .tb.active{color:var(--coral);}
@@ -535,6 +536,7 @@ function addFromInput(){
 function showMain(){
   $('#view-setup').classList.remove('active');
   $('#view-main').classList.add('active');
+  $('.tabbar').classList.add('show');
   $('#top-title').textContent = state.city + ' ' + state.days + ' 天游';
   renderDayChips();
   renderMap();
@@ -545,6 +547,7 @@ function showMain(){
 function backToSetup(){
   $('#view-main').classList.remove('active');
   $('#view-setup').classList.add('active');
+  $('.tabbar').classList.remove('show');
   renderSetup();
 }
 
@@ -574,9 +577,8 @@ function switchTab(name){
 
 /* ---------- ⑩ 地图渲染（腾讯地图 或 手绘示意） ---------- */
 function initRealMap(){
-  const el = $('#map-container');
   $('#mock-map').style.display='none';
-  el.style.display='block';
+  $('#map-container').style.display='block';
   if(window.TMap) buildRealMap();
   else if(!window.__mapLoading){
     window.__mapLoading = true;
@@ -596,7 +598,9 @@ function makePinSVG(color, num){
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
 function buildRealMap(){
+  if(window.__mapBuilt){ updateMap(); return; }
   const el = $('#map-container');
+  el.innerHTML = '';
   const pts = state.locations;
   const center = pts[0] ? new TMap.LatLng(pts[0].lat, pts[0].lng) : new TMap.LatLng(24.45,118.09);
   const map = new TMap.Map(el, {
@@ -604,19 +608,29 @@ function buildRealMap(){
     baseMap: { type:'vector' }
   });
   window.__map = map;
+  window.__mapBuilt = true;
+  updateMap();
+}
+function updateMap(){
+  const map = window.__map;
+  if(!map) return;
+  // 销毁旧的覆盖物，避免重复叠加导致卡顿
+  if(window.__markerLayer){ try{window.__markerLayer.setMap(null);}catch(e){} window.__markerLayer=null; }
+  if(window.__lineLayer){  try{window.__lineLayer.setMap(null);}catch(e){}  window.__lineLayer=null;  }
+  const pts = state.locations;
+  if(!pts.length) return;
   // 标记
-  const markerGeos = [];
   const layerGeos = { styles:{}, geometries:[] };
   const lineStyles = {}; const lineGeoms = [];
   const bounds = new TMap.LatLngBounds();
   pts.forEach((p, i)=>{
     const c = colorOf(p.day);
-    const sid = 's'+i;
+    const sid = 's'+p.id;
     layerGeos.styles[sid] = new TMap.MarkerStyle({ width:44, height:56, anchor:{x:22,y:52}, src: makePinSVG(c, i+1) });
     layerGeos.geometries.push({ id:'p'+p.id, styleId:sid, position:new TMap.LatLng(p.lat,p.lng) });
     bounds.extend(new TMap.LatLng(p.lat,p.lng));
   });
-  new TMap.MultiMarker({ map, ...layerGeos });
+  window.__markerLayer = new TMap.MultiMarker({ map, ...layerGeos });
   // 连线（按天）
   const byDay = {};
   pts.forEach(p=> (byDay[p.day]=byDay[p.day]||[]).push(p));
@@ -628,13 +642,16 @@ function buildRealMap(){
       lineGeoms.push({ id:'l'+d, styleId:'line'+d, paths });
     }
   });
-  if(lineGeoms.length) new TMap.MultiPolyline({ map, styles:lineStyles, geometries:lineGeoms });
+  if(lineGeoms.length) window.__lineLayer = new TMap.MultiPolyline({ map, styles:lineStyles, geometries:lineGeoms });
   if(pts.length) map.fitBounds(bounds, { padding: 60 });
 }
 function renderMap(){
   $('#map-hint-text').textContent = TENCENT_MAP_KEY
     ? '已配置地图Key · 腾讯地图' : '演示模式：未配置地图Key，显示手绘示意地图';
-  if(TENCENT_MAP_KEY){ initRealMap(); }
+  if(TENCENT_MAP_KEY){
+    if(window.__mapBuilt && window.__map){ updateMap(); }
+    else { initRealMap(); }
+  }
   else { $('#map-container').style.display='none'; $('#mock-map').style.display='block'; renderMockMap(); }
   renderLegend();
 }
@@ -1032,6 +1049,8 @@ function setupPWA(){
 function init(){
   setupPWA();
   load();
+  // 把底部导航挂到 body 下，彻底脱离地图 DOM 树的影响
+  document.body.appendChild($('.tabbar'));
   renderSetup();
   renderSuggest();
   // 如果已有行程，直接进主界面
